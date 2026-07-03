@@ -7,7 +7,7 @@ import {
   mobileGoogleLogin,
   mobileGoogleTokenLogin,
   mobileFacebookLogin,
-  mobileGithubLogin,
+  mobileGithubCodeLogin,
 } from "./auth.service.js";
 import User from "../user/user.model.js";
 import crypto from "crypto";
@@ -443,13 +443,13 @@ export const mobileFacebookAuth = async (req, res) => {
   }
 };
 
-export const mobileGithubAuth = async (req, res) => {
+export const mobileGithubCodeAuth = async (req, res) => {
   try {
-    const { accessToken } = req.body;
-    if (!accessToken) {
-      return res.status(400).json({ success: false, message: "GitHub access token required" });
+    const { code } = req.body;
+    if (!code) {
+      return res.status(400).json({ success: false, message: "GitHub authorization code required" });
     }
-    const result = await mobileGithubLogin(accessToken);
+    const result = await mobileGithubCodeLogin(code);
     res.json({
       success: true,
       data: {

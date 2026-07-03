@@ -428,16 +428,39 @@ export const mobileFacebookLogin = async (accessToken) => {
   };
 };
 
-export const mobileGithubLogin = async (accessToken) => {
-  // Get GitHub config from settings
+
+export const mobileGithubCodeLogin = async (code) => {
   const { getOAuthConfig } = await import("../settings/settings.service.js");
   const oauthConfig = await getOAuthConfig();
   const githubConfig = oauthConfig?.github;
 
   if (!githubConfig?.enabled) throw new Error("GitHub login is disabled");
-  if (!githubConfig?.clientId) throw new Error("GitHub OAuth is not configured");
+  if (!githubConfig?.clientId || !githubConfig?.clientSecret) {
+    throw new Error("GitHub OAuth is not configured");
+  }
 
-  // Verify token by calling GitHub API
+  // Exchange code for access token
+  const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: githubConfig.clientId,
+      client_secret: githubConfig.clientSecret,
+      code,
+    }),
+  });
+  const tokenData = await tokenRes.json();
+
+  if (tokenData.error || !tokenData.access_token) {
+    throw new Error("Invalid GitHub authorization code");
+  }
+
+  const accessToken = tokenData.access_token;
+
+  // Get user info
   const ghRes = await fetch("https://api.github.com/user", {
     headers: {
       Authorization: `token ${accessToken}`,
@@ -447,7 +470,7 @@ export const mobileGithubLogin = async (accessToken) => {
   const ghUser = await ghRes.json();
 
   if (ghUser.message || !ghUser.id) {
-    throw new Error("Invalid GitHub access token");
+    throw new Error("Failed to fetch GitHub user");
   }
 
   // Get primary email
@@ -466,9 +489,7 @@ export const mobileGithubLogin = async (accessToken) => {
   const name = ghUser.name || ghUser.login;
   const githubId = ghUser.id.toString();
 
-  let user = await User.findOne({
-    $or: [{ email }, { githubId }],
-  });
+  let user = await User.findOne({ $or: [{ email }, { githubId }] });
 
   if (!user) {
     user = await User.create({
@@ -485,40 +506,24 @@ export const mobileGithubLogin = async (accessToken) => {
     const updates = {};
     if (!user.githubId) updates.githubId = githubId;
     if (!user.oauthProvider) updates.oauthProvider = "github";
-
     const needsUpdate = !user.isActive || (user.role === "buyer" && !user.permissions?.canBid);
     if (needsUpdate) {
       updates.isActive = true;
       updates["permissions.canBid"] = true;
     }
-
     if (Object.keys(updates).length > 0) {
       user = await User.findByIdAndUpdate(user._id, updates, { new: true });
     }
   }
 
-  const jwtAccessToken = jwt.sign(
-    { id: user._id },
-    process.env.JWT_ACCESS_SECRET,
-    { expiresIn: process.env.JWT_ACCESS_EXPIRE || "2h" }
-  );
-  const refreshToken = jwt.sign(
-    { id: user._id },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: "7d" }
-  );
+  const jwtAccessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: process.env.JWT_ACCESS_EXPIRE || "2h" });
+  const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
 
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
 
   return {
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      permissions: user.permissions,
-    },
+    user: { id: user._id, name: user.name, email: user.email, role: user.role, permissions: user.permissions },
     accessToken: jwtAccessToken,
     refreshToken,
   };
