@@ -1,4 +1,4 @@
-import { Home, Bed, Bath, Calendar, Car } from "lucide-react";
+import { Home, Bed, Bath, Calendar, Armchair } from "lucide-react";
 import { preventMinus } from "@/utils/validation";
 
 export default function StepSpecifications({ form, updateField }: any) {
@@ -11,7 +11,7 @@ export default function StepSpecifications({ form, updateField }: any) {
         <div><label className="block text-sm font-bold mb-1"><Bath className="size-3 inline mr-1" />Bathrooms *</label><input type="number" min="0" max="50" step="1" onKeyDown={preventMinus} value={form.bathrooms} onChange={(e) => { const v = e.target.value; if (v === '' || Number(v) >= 0) updateField("bathrooms", v); }} className="w-full px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm" /></div>
         <div><label className="block text-sm font-bold mb-1">Floors</label><input type="number" min="0" max="200" step="1" onKeyDown={preventMinus} value={form.floors} onChange={(e) => { const v = e.target.value; if (v === '' || Number(v) >= 0) updateField("floors", v); }} className="w-full px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm" /></div>
         <div><label className="block text-sm font-bold mb-1"><Calendar className="size-3 inline mr-1" />Year Built</label><input type="number" min="1800" max={currentYear} step="1" onKeyDown={preventMinus} value={form.yearBuilt} onChange={(e) => { const val = e.target.value; if (val === '' || val.length <= 4) updateField("yearBuilt", val); }} className="w-full px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm" /></div>
-        <div><label className="block text-sm font-bold mb-1"><Car className="size-3 inline mr-1" />Parking</label><input type="number" min="0" max="100" step="1" onKeyDown={preventMinus} value={form.parkingSpaces} onChange={(e) => { const v = e.target.value; if (v === '' || Number(v) >= 0) updateField("parkingSpaces", v); }} className="w-full px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm" /></div>
+        <div><label className="block text-sm font-bold mb-1"><Armchair className="size-3 inline mr-1" />Lounge</label><input type="number" min="0" max="100" step="1" onKeyDown={preventMinus} value={form.parkingSpaces} onChange={(e) => { const v = e.target.value; if (v === '' || Number(v) >= 0) updateField("parkingSpaces", v); }} className="w-full px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm" /></div>
         <div>
           <label className="block text-sm font-bold mb-1">Furnished</label>
           <select value={form.furnishedStatus} onChange={(e) => updateField("furnishedStatus", e.target.value)} className="w-full px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm">

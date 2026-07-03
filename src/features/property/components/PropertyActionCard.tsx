@@ -589,25 +589,6 @@ export default function PropertyActionCard({
         </button>
       )}
 
-      {/* Enquire Button */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl border-2 border-white/60">
-        <button
-          onClick={onEnquire}
-          className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border-2 border-emerald-200 rounded-xl transition-all hover:scale-105 group"
-        >
-          <div className="size-10 bg-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <MessageSquare className="size-5 text-white" />
-          </div>
-          <div className="text-left">
-            <p className="font-black text-slate-900 text-sm">
-              Enquire About This Property
-            </p>
-            <p className="text-xs text-slate-500 font-medium">
-              Get more details from the agent
-            </p>
-          </div>
-        </button>
-      </div>
 
       {/* Property Information Card */}
       <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl border-2 border-white/60">

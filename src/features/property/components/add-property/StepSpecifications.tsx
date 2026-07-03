@@ -1,4 +1,4 @@
-import { Home, Bed, Bath, Calendar, Car } from "lucide-react";
+import { Home, Bed, Bath, Calendar, Armchair } from "lucide-react";
 import { preventMinus } from "@/utils/validation";
 
 interface StepSpecificationsProps {
@@ -115,19 +115,19 @@ export default function StepSpecifications({ formData, handleInputChange, theme 
 
         <div>
           <label className="block text-sm font-bold text-slate-700 mb-2">
-            <Car className="inline size-4 mr-1" />
-            Parking Spaces
+            <Armchair className="inline size-4 mr-1" />
+            Lounge
           </label>
           <input
             type="number"
-            placeholder="e.g., 2"
+            placeholder="e.g., 1"
             value={formData.parkingSpaces}
             onChange={(e) => {
               const v = e.target.value;
               if (v === '' || Number(v) >= 0) handleInputChange("parkingSpaces", v);
             }}
             min="0"
-            max="100"
+            max="10"
             step="1"
             onKeyDown={preventMinus}
             className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -1,4 +1,5 @@
 import { mediaUrl } from "@/lib/mediaUrl";
+import { ImageWithFallback } from "@/features/shared/figma/ImageWithFallback";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import AddressAutocomplete from "@/features/shared/components/AddressAutocomplete";
@@ -16,6 +17,7 @@ import {
   Building,
   Car,
   X,
+  Armchair,
 } from "lucide-react";
 import PublicLayout from "@/features/shared/layout/PublicLayout";
 import { usePropertyApi } from "@/features/property/api/usePropertyApi";
@@ -457,16 +459,20 @@ export default function ViewAllLots() {
                   onClick={() => navigate(`/properties/${lot.slug || lot._id}`)}
                 >
                   {/* Image */}
-                  <div className="relative h-56 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
-                    {lot.media?.propertyImages?.length > 0 ? (
-                      <img
-                        src={mediaUrl(lot.media.propertyImages[0])}
-                        alt={lot.propertyTitle}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    ) : (
+                  <div className="relative h-56 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center overflow-hidden">
+                    <ImageWithFallback
+                      src={
+                        lot.media?.propertyImages?.length > 0
+                          ? mediaUrl(lot.media.propertyImages[0])
+                          : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600"
+                      }
+                      alt={lot.propertyTitle}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="flex-col items-center gap-2" style={{display: 'none'}}>
                       <Home className="size-16 text-slate-400" />
-                    )}
+                      <span className="text-xs text-slate-400">Image failed to load</span>
+                    </div>
 
                     {/* Badges */}
                     <div className="absolute top-4 left-4 flex items-center gap-2 flex-wrap">
@@ -542,19 +548,11 @@ export default function ViewAllLots() {
                           {lot.specifications?.bathrooms ?? "-"}
                         </span>
                       </div>
-                      {(lot.specifications?.floors ?? 0) > 0 && (
-                        <div className="flex items-center gap-2">
-                          <Building className="size-4 text-green-600" />
-                          <span className="font-bold text-slate-900">
-                            {lot.specifications.floors} fl
-                          </span>
-                        </div>
-                      )}
                       {(lot.specifications?.parkingSpaces ?? 0) > 0 && (
                         <div className="flex items-center gap-2">
-                          <Car className="size-4 text-slate-600" />
+                          <Armchair className="size-4 text-amber-600" />
                           <span className="font-bold text-slate-900">
-                            {lot.specifications.parkingSpaces}P
+                            {lot.specifications.parkingSpaces} Lounge
                           </span>
                         </div>
                       )}

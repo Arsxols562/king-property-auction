@@ -1,15 +1,14 @@
 import { mediaUrl } from "@/lib/mediaUrl";
 import {
-  MapPin,
-  Bed,
-  Bath,
-  CheckCircle,
   AlertCircle,
   Gavel,
   Eye,
   ChevronDown,
   Building,
-  Car,
+  Armchair,
+  MapPin,
+  Bed,
+  Bath,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ImageWithFallback } from "@/features/shared/figma/ImageWithFallback";
@@ -105,19 +104,11 @@ export default function LotCard({
               {property.specifications?.bathrooms ?? "-"}
             </span>
           </div>
-          {(property.specifications?.floors ?? 0) > 0 && (
-            <div className="flex items-center gap-2">
-              <Building className="size-4 text-green-600" />
-              <span className="text-sm font-bold">
-                {property.specifications.floors} fl
-              </span>
-            </div>
-          )}
           {(property.specifications?.parkingSpaces ?? 0) > 0 && (
             <div className="flex items-center gap-2">
-              <Car className="size-4 text-slate-600" />
+              <Armchair className="size-4 text-amber-600" />
               <span className="text-sm font-bold">
-                {property.specifications.parkingSpaces}P
+                {property.specifications.parkingSpaces} Lounge
               </span>
             </div>
           )}

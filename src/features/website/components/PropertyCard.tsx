@@ -14,6 +14,7 @@ import {
   Gavel,
   Building,
   Car,
+  Armchair,
 } from "lucide-react";
 import { ImageWithFallback } from "@/features/shared/figma/ImageWithFallback";
 import AuctionTimer from "@/features/shared/components/AuctionTimer";
@@ -218,24 +219,13 @@ export default function PropertyCard({
               {property.specifications?.bathrooms ?? "-"}
             </span>
           </div>
-          {(property.specifications?.floors ?? 0) > 0 && (
-            <div className="flex items-center gap-2">
-              <div className="size-9 rounded-xl bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
-                <Building className="size-4 text-green-600" />
-              </div>
-              <span className="text-sm font-bold text-slate-900">
-                {property.specifications.floors} fl
-              </span>
-            </div>
-          )}
-
           {(property.specifications?.parkingSpaces ?? 0) > 0 && (
             <div className="flex items-center gap-2">
-              <div className="size-9 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                <Car className="size-4 text-slate-600" />
+              <div className="size-9 rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+                <Armchair className="size-4 text-amber-600" />
               </div>
               <span className="text-sm font-bold text-slate-900">
-                {property.specifications.parkingSpaces}P
+                {property.specifications.parkingSpaces} Lounge
               </span>
             </div>
           )}

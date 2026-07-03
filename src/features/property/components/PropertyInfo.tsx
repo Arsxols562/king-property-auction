@@ -18,6 +18,11 @@ import {
   TreePine,
   Building,
   Factory,
+  Sofa,
+  Layers,
+  DoorOpen,
+  Armchair,
+  MessageSquare,
 } from "lucide-react";
 import AuctionTimer from "@/features/shared/components/AuctionTimer";
 import { formatUKDateTime } from "@/features/shared/utils/dateUtils";
@@ -45,6 +50,7 @@ interface PropertyInfoProps {
   bidHistory: any;
   loadingHistory: boolean;
   onToggleBidHistory: () => void;
+  onEnquire?: () => void;
 }
 
 export default function PropertyInfo({
@@ -69,6 +75,7 @@ export default function PropertyInfo({
   bidHistory,
   loadingHistory,
   onToggleBidHistory,
+  onEnquire,
 }: PropertyInfoProps) {
   return (
     <div className="lg:col-span-2 space-y-6">
@@ -146,12 +153,48 @@ export default function PropertyInfo({
               value: property.specifications?.bathrooms || 0,
               label: "Bathrooms",
             },
-            // {
-            //   icon: Car,
-            //   gradient: "from-orange-500 to-amber-600",
-            //   value: property.specifications?.parkingSpaces || 0,
-            //   label: "Parking",
-            // },
+            ...(property.specifications?.parkingSpaces > 0 ? [{
+              icon: Armchair,
+              gradient: "from-amber-500 to-orange-600",
+              value: property.specifications.parkingSpaces,
+              label: "Lounge",
+            }] : []),
+            {
+              icon:
+                property.propertyType === "house" ? Home :
+                property.propertyType === "apartment" ? Building2 :
+                property.propertyType === "land" ? TreePine :
+                property.propertyType === "commercial" ? Building :
+                property.propertyType === "farmhouse" ? Home :
+                property.propertyType === "villa" ? Building2 :
+                property.propertyCategory === "residential" ? Building2 :
+                property.propertyCategory === "industrial" ? Factory :
+                Layers,
+              gradient:
+                property.propertyType === "house" ? "from-blue-500 to-indigo-600" :
+                property.propertyType === "apartment" ? "from-purple-500 to-pink-600" :
+                property.propertyType === "land" ? "from-green-500 to-emerald-600" :
+                property.propertyType === "commercial" ? "from-amber-500 to-yellow-600" :
+                property.propertyType === "farmhouse" ? "from-orange-500 to-red-600" :
+                property.propertyType === "villa" ? "from-rose-500 to-pink-600" :
+                property.propertyCategory === "residential" ? "from-indigo-500 to-blue-600" :
+                property.propertyCategory === "industrial" ? "from-slate-500 to-slate-700" :
+                "from-purple-500 to-pink-600",
+              value: "",
+              label: "Type",
+              isBadge: true,
+              badgeText: property.propertyType
+                ? property.propertyType.charAt(0).toUpperCase() + property.propertyType.slice(1)
+                : "N/A",
+            },
+            {
+              icon: DoorOpen,
+              gradient: "from-slate-500 to-slate-700",
+              value: "",
+              label: "Occupation",
+              isBadge: true,
+              badgeText: property.propertyStatus === "sold" ? "Occupied" : "Unoccupied",
+            },
           ].map((stat, idx) => (
             <div key={idx} className="flex items-center gap-3">
               <div
@@ -160,9 +203,15 @@ export default function PropertyInfo({
                 <stat.icon className="size-6 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-black text-slate-900">
-                  {stat.value}
-                </div>
+                {(stat as any).isBadge ? (
+                  <span className="inline-block px-2 py-0.5 bg-slate-100 rounded-lg text-sm font-bold text-slate-700">
+                    {(stat as any).badgeText}
+                  </span>
+                ) : (
+                  <div className="text-2xl font-black text-slate-900">
+                    {stat.value}
+                  </div>
+                )}
                 <div className="text-xs font-semibold text-slate-500">
                   {stat.label}
                 </div>
@@ -332,54 +381,6 @@ export default function PropertyInfo({
         )}
       </div>
 
-      {/* Property Details */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border-2 border-white/60">
-        <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
-          <Info className="size-6 text-blue-600" />
-          Property Details
-        </h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border-2 border-blue-100">
-            <p className="text-sm font-bold text-blue-600 mb-1">Status</p>
-            <p className="text-lg font-bold text-slate-900">
-              {property.propertyStatus === "sold" ? "✅ Occupied" : " Unoccupied"}
-            </p>
-          </div>
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border-2 border-purple-100">
-            <p className="text-sm font-bold text-purple-600 mb-1">Type</p>
-              <p className="text-lg font-bold text-slate-900 capitalize flex items-center gap-2">
-                {property.propertyType === "house" && <><Home className="size-5 text-blue-600" /> House</>}
-                {property.propertyType === "apartment" && <><Building2 className="size-5 text-purple-600" /> Apartment</>}
-                {property.propertyType === "land" && <><TreePine className="size-5 text-green-600" /> Land</>}
-                {property.propertyType === "commercial" && <><Building className="size-5 text-amber-600" /> Commercial</>}
-                {property.propertyType === "farmhouse" && <><Home className="size-5 text-orange-600" /> Farmhouse</>}
-                {property.propertyType === "villa" && <><Building2 className="size-5 text-rose-600" /> Villa</>}
-                {property.propertyCategory === "residential" && !["house","apartment","farmhouse","villa"].includes(property.propertyType) && <><Building2 className="size-5 text-indigo-600" /> Residential</>}
-                {property.propertyCategory === "industrial" && <><Factory className="size-5 text-slate-600" /> Industrial</>}
-                {!["house","apartment","land","commercial","farmhouse","villa"].includes(property.propertyType) && !["residential","industrial"].includes(property.propertyCategory) && <><Building2 className="size-5 text-slate-600" /> {property.propertyType || "N/A"}</>}
-              </p>
-          </div>
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border-2 border-emerald-100">
-            <p className="text-sm font-bold text-emerald-600 mb-1">
-              Occupation
-            </p>
-            <p className="text-lg font-bold text-slate-900">
-              {property.propertyStatus === "sold" ? "Occupied" : "Unoccupied"}
-            </p>
-          </div>
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border-2 border-amber-100">
-            <p className="text-sm font-bold text-amber-600 mb-1">Council Tax</p>
-            <a
-              href={`https://www.saa.gov.uk/search/?SEARCHED=1&SEARCH_TABLE=council_tax&SEARCH_TERM=${encodeURIComponent(property.location?.postalCode || "")}#results`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-lg font-black text-blue-600 hover:text-blue-800 flex items-center gap-1"
-            >
-              Search <ExternalLink className="size-4" />
-            </a>
-          </div>
-        </div>
-      </div>
 
       {/* Description */}
       <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border-2 border-white/60">
@@ -662,6 +663,55 @@ export default function PropertyInfo({
           </a>
         </div>
       </div>
+
+      
+      {/* Enquire + Council Tax */}
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl border-2 border-white/60">
+        <h2 className="text-lg font-black text-slate-900 mb-4 flex items-center gap-2">
+          <MessageSquare className="size-5 text-emerald-600" />
+          Enquire & Info
+        </h2>
+        <div className="flex items-stretch gap-3">
+          {/* Enquire Button */}
+          <button
+            onClick={onEnquire || (() => {})}
+            className="flex-1 flex items-center gap-3 p-3 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border-2 border-emerald-200 rounded-xl transition-all"
+          >
+            <div className="size-10 bg-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <MessageSquare className="size-5 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="font-black text-slate-900 text-xs">
+                Enquire About This Property
+              </p>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Get more details from the agent
+              </p>
+            </div>
+          </button>
+
+          {/* Council Tax */}
+          <a
+            href={`https://www.saa.gov.uk/search/?SEARCHED=1&SEARCH_TABLE=council_tax&SEARCH_TERM=${encodeURIComponent(property.location?.postalCode || "")}#results`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center gap-3 p-3 bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 rounded-xl transition-all"
+          >
+            <div className="size-10 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <FileText className="size-5 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="font-black text-slate-900 text-xs">
+                Council Tax
+              </p>
+              <p className="text-[11px] text-blue-600 font-medium flex items-center gap-1">
+                Search <ExternalLink className="size-3" />
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
+
     </div>
   );
 }
