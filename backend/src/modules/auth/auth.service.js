@@ -184,3 +184,141 @@ export const refreshAccessToken = async (token) => {
 export const logoutUser = async (userId) => {
   await User.findByIdAndUpdate(userId, { refreshToken: null });
 };
+
+export const mobileGoogleLogin = async (idToken) => {
+  // Get Google client ID from settings
+  const { getOAuthConfig } = await import("../settings/settings.service.js");
+  const oauthConfig = await getOAuthConfig();
+  const googleClientId = oauthConfig?.google?.clientId;
+
+  if (!googleClientId) throw new Error('Google OAuth is not configured');
+
+  // Verify the Google ID token
+  const { OAuth2Client } = await import('google-auth-library');
+  const client = new OAuth2Client();
+  
+  const ticket = await client.verifyIdToken({
+    idToken,
+    audience: googleClientId,
+  });
+  
+  const payload = ticket.getPayload();
+  const email = payload.email;
+  const name = payload.name;
+
+  if (!email) throw new Error('No email from Google');
+
+  let user = await User.findOne({ email });
+  if (!user) {
+    user = await User.create({
+      name,
+      email,
+      password: 'oauth-' + Math.random().toString(36).slice(2),
+      role: 'buyer',
+      isActive: true,
+      permissions: { canBid: true, canListProperties: false },
+    });
+  } else {
+    const needsUpdate = !user.isActive || (user.role === 'buyer' && !user.permissions?.canBid);
+    if (needsUpdate) {
+      user = await User.findByIdAndUpdate(
+        user._id,
+        { isActive: true, 'permissions.canBid': true },
+        { new: true }
+      );
+    }
+  }
+
+  const accessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRE || '2h',
+  });
+  const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: '7d',
+  });
+
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+
+  return {
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      permissions: user.permissions,
+    },
+    accessToken,
+    refreshToken,
+  };
+};
+
+export const mobileGoogleTokenLogin = async (accessToken, email) => {
+  // Get Google client ID from settings
+  const { getOAuthConfig } = await import("../settings/settings.service.js");
+  const oauthConfig = await getOAuthConfig();
+  const googleClientId = oauthConfig?.google?.clientId;
+
+  if (!googleClientId) throw new Error('Google OAuth is not configured');
+
+  // Verify the access token with Google's API
+  const response = await fetch(
+    `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`
+  );
+  const tokenInfo = await response.json();
+
+  if (tokenInfo.error) {
+    throw new Error('Invalid Google access token');
+  }
+
+  // Verify audience matches
+  if (tokenInfo.aud !== googleClientId) {
+    throw new Error('Token was not issued for this application');
+  }
+
+  // Use email from Google if provided, else from request
+  const verifiedEmail = tokenInfo.email || email;
+  if (!verifiedEmail) throw new Error('No email from Google');
+
+  let user = await User.findOne({ email: verifiedEmail });
+  if (!user) {
+    user = await User.create({
+      name: email ? email.split('@')[0] : 'User',
+      email: verifiedEmail,
+      password: 'oauth-' + Math.random().toString(36).slice(2),
+      role: 'buyer',
+      isActive: true,
+      permissions: { canBid: true, canListProperties: false },
+    });
+  } else {
+    const needsUpdate = !user.isActive || (user.role === 'buyer' && !user.permissions?.canBid);
+    if (needsUpdate) {
+      user = await User.findByIdAndUpdate(
+        user._id,
+        { isActive: true, 'permissions.canBid': true },
+        { new: true }
+      );
+    }
+  }
+
+  const jwtAccessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRE || '2h',
+  });
+  const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: '7d',
+  });
+
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+
+  return {
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      permissions: user.permissions,
+    },
+    accessToken: jwtAccessToken,
+    refreshToken,
+  };
+};

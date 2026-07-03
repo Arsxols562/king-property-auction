@@ -4,6 +4,8 @@ import {
   loginUser,
   refreshAccessToken,
   logoutUser,
+  mobileGoogleLogin,
+  mobileGoogleTokenLogin,
 } from "./auth.service.js";
 import User from "../user/user.model.js";
 import crypto from "crypto";
@@ -392,8 +394,28 @@ export const mobileGoogleAuth = async (req, res) => {
     if (!idToken) {
       return res.status(400).json({ success: false, message: "Google ID token required" });
     }
-    const result = await authService.mobileGoogleLogin(idToken);
+    const result = await mobileGoogleLogin(idToken);
     res.json({ success: true, user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken });
+  } catch (error) {
+    res.status(401).json({ success: false, message: error.message });
+  }
+};
+
+export const mobileGoogleTokenAuth = async (req, res) => {
+  try {
+    const { accessToken, email } = req.body;
+    if (!accessToken) {
+      return res.status(400).json({ success: false, message: "Google access token required" });
+    }
+    const result = await mobileGoogleTokenLogin(accessToken, email);
+    res.json({ 
+      success: true, 
+      data: {
+        token: result.accessToken,
+        refreshToken: result.refreshToken,
+        user: result.user,
+      }
+    });
   } catch (error) {
     res.status(401).json({ success: false, message: error.message });
   }

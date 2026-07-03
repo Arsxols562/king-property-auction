@@ -11,6 +11,7 @@ import {
   resetPassword,
   refreshMobile,
   mobileGoogleAuth,
+  mobileGoogleTokenAuth,
 } from "./auth.controller.js";
 import { protect } from "../../middlewares/auth.middleware.js";
 import passport, {
@@ -311,5 +312,6 @@ router.get("/facebook/mobile/callback", async (req, res, next) => {
 // ─── Mobile Auth (Native) ──────────────────────────────────────────────────
 router.post("/mobile/refresh", refreshMobile);
 router.post("/mobile/google", mobileGoogleAuth);
+router.post("/google/mobile-token", mobileGoogleTokenAuth);
 
 export default router;
