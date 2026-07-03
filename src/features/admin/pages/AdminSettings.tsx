@@ -55,7 +55,7 @@ export default function AdminSettings() {
   });
 
   const [oauthForm, setOAuthForm] = useState({
-    google: { enabled: false, clientId: "", clientSecret: "" },
+    google: { enabled: false, clientId: "", clientSecret: "", androidClientId: "" },
     github: { enabled: false, clientId: "", clientSecret: "" },
     facebook: { enabled: false, clientId: "", clientSecret: "" },
   });

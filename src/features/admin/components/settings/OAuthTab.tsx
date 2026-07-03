@@ -1,7 +1,7 @@
 import { Save } from "lucide-react";
 
 interface OAuthForm {
-  google: { enabled: boolean; clientId: string; clientSecret: string };
+  google: { enabled: boolean; clientId: string; clientSecret: string; androidClientId: string };
   github: { enabled: boolean; clientId: string; clientSecret: string };
   facebook: { enabled: boolean; clientId: string; clientSecret: string };
 }
@@ -79,6 +79,26 @@ export default function OAuthTab({
               className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
+        </div>
+        <div className="mt-4">
+          <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
+            Android Client ID
+          </label>
+          <input
+            type="text"
+            placeholder="Android OAuth Client ID (for mobile app)"
+            value={oauthForm.google.androidClientId || ""}
+            onChange={(e) =>
+              setOAuthForm({
+                ...oauthForm,
+                google: { ...oauthForm.google, androidClientId: e.target.value },
+              })
+            }
+            className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          />
+          <p className="text-xs text-slate-400 mt-1">
+            For Android app Google Sign-In. Create a separate OAuth Client ID in Google Cloud Console for Android platform.
+          </p>
         </div>
         <p className="text-xs text-slate-500 mt-2">
           Redirect URI:{" "}

@@ -191,50 +191,61 @@ export const mobileGoogleLogin = async (idToken) => {
   const oauthConfig = await getOAuthConfig();
   const googleClientId = oauthConfig?.google?.clientId;
 
-  if (!googleClientId) throw new Error('Google OAuth is not configured');
+  if (!googleClientId) throw new Error("Google OAuth is not configured");
 
   // Verify the Google ID token
-  const { OAuth2Client } = await import('google-auth-library');
+  const { OAuth2Client } = await import("google-auth-library");
   const client = new OAuth2Client();
-  
+
   const ticket = await client.verifyIdToken({
     idToken,
-    audience: googleClientId,
+    audience: [googleClientId, oauthConfig?.google?.androidClientId].filter(
+      Boolean,
+    ),
   });
-  
+
   const payload = ticket.getPayload();
   const email = payload.email;
   const name = payload.name;
 
-  if (!email) throw new Error('No email from Google');
+  if (!email) throw new Error("No email from Google");
 
   let user = await User.findOne({ email });
   if (!user) {
     user = await User.create({
       name,
       email,
-      password: 'oauth-' + Math.random().toString(36).slice(2),
-      role: 'buyer',
+      password: "oauth-" + Math.random().toString(36).slice(2),
+      role: "buyer",
       isActive: true,
       permissions: { canBid: true, canListProperties: false },
     });
   } else {
-    const needsUpdate = !user.isActive || (user.role === 'buyer' && !user.permissions?.canBid);
+    const needsUpdate =
+      !user.isActive || (user.role === "buyer" && !user.permissions?.canBid);
     if (needsUpdate) {
       user = await User.findByIdAndUpdate(
         user._id,
-        { isActive: true, 'permissions.canBid': true },
-        { new: true }
+        { isActive: true, "permissions.canBid": true },
+        { new: true },
       );
     }
   }
 
-  const accessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRE || '2h',
-  });
-  const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: '7d',
-  });
+  const accessToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_ACCESS_SECRET,
+    {
+      expiresIn: process.env.JWT_ACCESS_EXPIRE || "2h",
+    },
+  );
+  const refreshToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: "7d",
+    },
+  );
 
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
@@ -258,54 +269,148 @@ export const mobileGoogleTokenLogin = async (accessToken, email) => {
   const oauthConfig = await getOAuthConfig();
   const googleClientId = oauthConfig?.google?.clientId;
 
-  if (!googleClientId) throw new Error('Google OAuth is not configured');
+  if (!googleClientId) throw new Error("Google OAuth is not configured");
 
   // Verify the access token with Google's API
   const response = await fetch(
-    `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`
+    `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`,
   );
   const tokenInfo = await response.json();
 
   if (tokenInfo.error) {
-    throw new Error('Invalid Google access token');
+    throw new Error("Invalid Google access token");
   }
 
-  // Verify audience matches
-  if (tokenInfo.aud !== googleClientId) {
+  // Verify audience matches - supports both Web and Android client IDs
+  const validClientIds = [googleClientId, oauthConfig?.google?.androidClientId].filter(Boolean);
+  if (!validClientIds.includes(tokenInfo.aud)) {
     throw new Error('Token was not issued for this application');
   }
 
   // Use email from Google if provided, else from request
   const verifiedEmail = tokenInfo.email || email;
-  if (!verifiedEmail) throw new Error('No email from Google');
+  if (!verifiedEmail) throw new Error("No email from Google");
 
   let user = await User.findOne({ email: verifiedEmail });
   if (!user) {
     user = await User.create({
-      name: email ? email.split('@')[0] : 'User',
+      name: email ? email.split("@")[0] : "User",
       email: verifiedEmail,
-      password: 'oauth-' + Math.random().toString(36).slice(2),
-      role: 'buyer',
+      password: "oauth-" + Math.random().toString(36).slice(2),
+      role: "buyer",
       isActive: true,
       permissions: { canBid: true, canListProperties: false },
     });
   } else {
-    const needsUpdate = !user.isActive || (user.role === 'buyer' && !user.permissions?.canBid);
+    const needsUpdate =
+      !user.isActive || (user.role === "buyer" && !user.permissions?.canBid);
     if (needsUpdate) {
       user = await User.findByIdAndUpdate(
         user._id,
-        { isActive: true, 'permissions.canBid': true },
-        { new: true }
+        { isActive: true, "permissions.canBid": true },
+        { new: true },
       );
     }
   }
 
-  const jwtAccessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRE || '2h',
+  const jwtAccessToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_ACCESS_SECRET,
+    {
+      expiresIn: process.env.JWT_ACCESS_EXPIRE || "2h",
+    },
+  );
+  const refreshToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: "7d",
+    },
+  );
+
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+
+  return {
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      permissions: user.permissions,
+    },
+    accessToken: jwtAccessToken,
+    refreshToken,
+  };
+};
+
+export const mobileFacebookLogin = async (accessToken) => {
+  // Get Facebook App config from settings
+  const { getOAuthConfig } = await import("../settings/settings.service.js");
+  const oauthConfig = await getOAuthConfig();
+  const facebookConfig = oauthConfig?.facebook;
+
+  if (!facebookConfig?.enabled) throw new Error("Facebook login is disabled");
+  if (!facebookConfig?.clientId) throw new Error("Facebook OAuth is not configured");
+
+  // Verify token with Facebook Graph API
+  const fbRes = await fetch(
+    `https://graph.facebook.com/me?access_token=${accessToken}&fields=id,name,email`
+  );
+  const fbUser = await fbRes.json();
+
+  if (fbUser.error || !fbUser.id) {
+    throw new Error("Invalid Facebook access token");
+  }
+
+  const email = fbUser.email;
+  const name = fbUser.name;
+  const facebookId = fbUser.id;
+
+  if (!email) throw new Error("Facebook account has no email. Please use a different login method.");
+
+  let user = await User.findOne({
+    $or: [{ email }, { facebookId }],
   });
-  const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: '7d',
-  });
+
+  if (!user) {
+    user = await User.create({
+      name: name || "Facebook User",
+      email,
+      password: "oauth-" + Math.random().toString(36).slice(2),
+      role: "buyer",
+      isActive: true,
+      facebookId,
+      oauthProvider: "facebook",
+      permissions: { canBid: true, canListProperties: false },
+    });
+  } else {
+    // Update facebookId if not set
+    const updates = {};
+    if (!user.facebookId) updates.facebookId = facebookId;
+    if (!user.oauthProvider) updates.oauthProvider = "facebook";
+    
+    const needsUpdate = !user.isActive || (user.role === "buyer" && !user.permissions?.canBid);
+    if (needsUpdate) {
+      updates.isActive = true;
+      updates["permissions.canBid"] = true;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      user = await User.findByIdAndUpdate(user._id, updates, { new: true });
+    }
+  }
+
+  const jwtAccessToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_ACCESS_SECRET,
+    { expiresIn: process.env.JWT_ACCESS_EXPIRE || "2h" }
+  );
+  const refreshToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: "7d" }
+  );
 
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });

@@ -6,6 +6,7 @@ import {
   logoutUser,
   mobileGoogleLogin,
   mobileGoogleTokenLogin,
+  mobileFacebookLogin,
 } from "./auth.service.js";
 import User from "../user/user.model.js";
 import crypto from "crypto";
@@ -415,6 +416,26 @@ export const mobileGoogleTokenAuth = async (req, res) => {
         refreshToken: result.refreshToken,
         user: result.user,
       }
+    });
+  } catch (error) {
+    res.status(401).json({ success: false, message: error.message });
+  }
+};
+
+export const mobileFacebookAuth = async (req, res) => {
+  try {
+    const { accessToken } = req.body;
+    if (!accessToken) {
+      return res.status(400).json({ success: false, message: "Facebook access token required" });
+    }
+    const result = await mobileFacebookLogin(accessToken);
+    res.json({
+      success: true,
+      data: {
+        token: result.accessToken,
+        refreshToken: result.refreshToken,
+        user: result.user,
+      },
     });
   } catch (error) {
     res.status(401).json({ success: false, message: error.message });
