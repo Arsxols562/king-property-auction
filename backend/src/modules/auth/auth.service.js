@@ -427,3 +427,99 @@ export const mobileFacebookLogin = async (accessToken) => {
     refreshToken,
   };
 };
+
+export const mobileGithubLogin = async (accessToken) => {
+  // Get GitHub config from settings
+  const { getOAuthConfig } = await import("../settings/settings.service.js");
+  const oauthConfig = await getOAuthConfig();
+  const githubConfig = oauthConfig?.github;
+
+  if (!githubConfig?.enabled) throw new Error("GitHub login is disabled");
+  if (!githubConfig?.clientId) throw new Error("GitHub OAuth is not configured");
+
+  // Verify token by calling GitHub API
+  const ghRes = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `token ${accessToken}`,
+      "User-Agent": "King-Property-Auction",
+    },
+  });
+  const ghUser = await ghRes.json();
+
+  if (ghUser.message || !ghUser.id) {
+    throw new Error("Invalid GitHub access token");
+  }
+
+  // Get primary email
+  const emailRes = await fetch("https://api.github.com/user/emails", {
+    headers: {
+      Authorization: `token ${accessToken}`,
+      "User-Agent": "King-Property-Auction",
+    },
+  });
+  const emails = await emailRes.json();
+  const primaryEmail = Array.isArray(emails)
+    ? emails.find((e) => e.primary && e.verified)?.email
+    : null;
+
+  const email = primaryEmail || `${ghUser.login}@github.user`;
+  const name = ghUser.name || ghUser.login;
+  const githubId = ghUser.id.toString();
+
+  let user = await User.findOne({
+    $or: [{ email }, { githubId }],
+  });
+
+  if (!user) {
+    user = await User.create({
+      name,
+      email,
+      password: "oauth-" + Math.random().toString(36).slice(2),
+      role: "buyer",
+      isActive: true,
+      githubId,
+      oauthProvider: "github",
+      permissions: { canBid: true, canListProperties: false },
+    });
+  } else {
+    const updates = {};
+    if (!user.githubId) updates.githubId = githubId;
+    if (!user.oauthProvider) updates.oauthProvider = "github";
+
+    const needsUpdate = !user.isActive || (user.role === "buyer" && !user.permissions?.canBid);
+    if (needsUpdate) {
+      updates.isActive = true;
+      updates["permissions.canBid"] = true;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      user = await User.findByIdAndUpdate(user._id, updates, { new: true });
+    }
+  }
+
+  const jwtAccessToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_ACCESS_SECRET,
+    { expiresIn: process.env.JWT_ACCESS_EXPIRE || "2h" }
+  );
+  const refreshToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+
+  return {
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      permissions: user.permissions,
+    },
+    accessToken: jwtAccessToken,
+    refreshToken,
+  };
+};

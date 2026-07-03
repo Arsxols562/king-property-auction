@@ -13,6 +13,7 @@ import {
   mobileGoogleAuth,
   mobileGoogleTokenAuth,
   mobileFacebookAuth,
+  mobileGithubAuth,
 } from "./auth.controller.js";
 import { protect } from "../../middlewares/auth.middleware.js";
 import passport, {
@@ -315,5 +316,6 @@ router.post("/mobile/refresh", refreshMobile);
 router.post("/mobile/google", mobileGoogleAuth);
 router.post("/google/mobile-token", mobileGoogleTokenAuth);
 router.post("/mobile/facebook", mobileFacebookAuth);
+router.post("/mobile/github", mobileGithubAuth);
 
 export default router;
