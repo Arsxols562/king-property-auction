@@ -7,7 +7,7 @@ export const usePropertyApi = () => {
 
   const useGetProperties = (params?: QueryParams) => {
     return useQuery<any>({
-      queryKey: ["properties", params],
+      queryKey: ["properties", params?.page, params?.search, params?.type, params?.status, params?.approvalStatus],
       queryFn: async () => {
         const query = new URLSearchParams();
         if (params?.page) query.set("page", String(params.page));

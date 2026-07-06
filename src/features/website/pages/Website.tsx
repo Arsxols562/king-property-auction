@@ -266,7 +266,7 @@ export default function Website() {
 
     if (newBidValue < nextMinBid) {
       showNotification(
-        `Your bid must be at least £${nextMinBid.toLocaleString()} (current bid + £${bidIncrement.toLocaleString()} increment)`,
+        ` Bid must be at least £${nextMinBid.toLocaleString()}`,
         "error",
       );
       return;

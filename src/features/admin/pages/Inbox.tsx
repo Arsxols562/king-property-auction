@@ -17,6 +17,7 @@ export default function Inbox() {
   const [isSending, setIsSending] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [agentRequests, setAgentRequests] = useState<any[]>([]);
+  const [showList, setShowList] = useState(true);
 
   // ─── Fetch conversations ───
   const { data: conversationsData, isLoading } = useQuery({
@@ -153,38 +154,44 @@ export default function Inbox() {
   const openConversation = (conv: any) => {
     setSelectedConv(conv);
     setTypingUsers([]);
+    setShowList(false);
     setAgentRequests(prev => prev.filter((r: any) => r.conversationId !== conv._id));
   };
 
   return (
     <AdminLayout activeTab="inbox" onTabChange={() => {}}>
       <div className="flex h-[calc(100vh-120px)] rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg">
-        <ConversationList
-          conversations={conversations}
-          selected={selectedConv}
-          onSelect={openConversation}
-          loading={isLoading}
-          search={search}
-          onSearch={setSearch}
-          filter={filter}
-          onFilterChange={setFilter}
-          stats={stats}
-        />
-        <MessageThread
-          conversation={selectedConv}
-          messages={messages}
-          onSend={handleSend}
-          isSending={isSending}
-          typingUsers={typingUsers}
-          onUpdateConv={handleUpdateConv}
-          agentRequests={agentRequests}
-          onDismissAgentRequest={(convToOpen) => {
-            if (convToOpen) openConversation(convToOpen);
-            setAgentRequests(prev => prev.slice(1));
-          }}
-          conversations={conversations}
-          sendTyping={sendTyping}
-        />
+        <div className={`${!showList && selectedConv ? 'hidden' : 'flex'} md:flex w-full md:w-80 flex-shrink-0`}>
+          <ConversationList
+            conversations={conversations}
+            selected={selectedConv}
+            onSelect={openConversation}
+            loading={isLoading}
+            search={search}
+            onSearch={setSearch}
+            filter={filter}
+            onFilterChange={setFilter}
+            stats={stats}
+          />
+        </div>
+        <div className={`${showList || !selectedConv ? 'hidden' : 'flex'} md:flex flex-1`}>
+          <MessageThread
+            conversation={selectedConv}
+            messages={messages}
+            onSend={handleSend}
+            isSending={isSending}
+            typingUsers={typingUsers}
+            onUpdateConv={handleUpdateConv}
+            agentRequests={agentRequests}
+            onDismissAgentRequest={(convToOpen) => {
+              if (convToOpen) openConversation(convToOpen);
+              setAgentRequests(prev => prev.slice(1));
+            }}
+            conversations={conversations}
+            sendTyping={sendTyping}
+            onBack={() => setShowList(true)}
+          />
+        </div>
       </div>
     </AdminLayout>
   );

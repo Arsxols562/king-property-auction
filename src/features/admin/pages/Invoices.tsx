@@ -176,25 +176,19 @@ export default function Invoices() {
     doc.text("Buyer:", m, y);
     y += 6;
     doc.setFont("helvetica", "normal");
-    doc.text(`  ${invoice.buyer?.name || invoice.buyerName || "N/A"}`, m, y);
+    doc.text(`  ${invoice.buyerName || invoice.buyer?.name || "N/A"}`, m, y);
     y += 5;
-    doc.text(`  ${invoice.buyer?.email || invoice.buyerEmail || ""}`, m, y);
+    doc.text(`  ${invoice.buyerEmail || invoice.buyer?.email || ""}`, m, y);
 
     y += 5;
-    const buyerAddressData = invoice.buyer?.address || invoice.buyerAddress;
-    const buyerAddr = buyerAddressData
-      ? [
-          buyerAddressData.street,
-          buyerAddressData.city,
-          buyerAddressData.postcode,
-        ]
-          .filter(Boolean)
-          .join(", ")
-      : "";
+    const buyerAddr = invoice.buyerAddress || invoice.buyer?.address;
     if (buyerAddr) {
-      doc.setFontSize(8);
-      doc.text(`  ${buyerAddr}`, m, y);
-      y += 5;
+      const parts = [buyerAddr.street, buyerAddr.city, buyerAddr.postcode].filter(Boolean);
+      if (parts.length > 0) {
+        doc.setFontSize(8);
+        doc.text(`  ${parts.join(", ")}`, m, y);
+        y += 5;
+      }
     }
     y += 3;
 
@@ -461,16 +455,16 @@ export default function Invoices() {
   return (
     <AdminLayout activeTab="invoices" onTabChange={() => {}}>
       <div>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-3xl font-black text-slate-900">Invoices</h2>
-            <p className="text-slate-600 font-medium mt-1">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">Invoices</h2>
+            <p className="text-sm sm:text-base text-slate-600 font-medium">
               Manage all property invoices
             </p>
           </div>
           <button
             onClick={openGenerateModal}
-            className="px-4 py-2 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 transition-all flex items-center gap-2"
+            className="px-5 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-all flex items-center gap-2 w-fit"
           >
             <FileText className="size-4" /> Generate Invoice
           </button>
@@ -555,7 +549,8 @@ export default function Invoices() {
               </p>
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[900px]">
               <thead className="bg-gradient-to-r from-blue-600 to-indigo-600">
                 <tr>
                   {[
@@ -594,14 +589,17 @@ export default function Invoices() {
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <p className="font-semibold text-slate-900">
-                        {inv.buyer?.name || inv.buyerName || "N/A"}
+                        {inv.buyerName || inv.buyer?.name || "N/A"}
                       </p>
-                      {(inv.buyer?.address || inv.buyerAddress) && (
-                        <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-xs text-slate-500">
+                        {inv.buyerEmail || inv.buyer?.email || ""}
+                      </p>
+                      {(inv.buyerAddress || inv.buyer?.address) && (
+                        <p className="text-xs text-slate-400 mt-0.5">
                           {[
-                            (inv.buyer?.address || inv.buyerAddress)?.street,
-                            (inv.buyer?.address || inv.buyerAddress)?.city,
-                            (inv.buyer?.address || inv.buyerAddress)?.postcode,
+                            (inv.buyerAddress || inv.buyer?.address)?.street,
+                            (inv.buyerAddress || inv.buyer?.address)?.city,
+                            (inv.buyerAddress || inv.buyer?.address)?.postcode,
                           ]
                             .filter(Boolean)
                             .join(", ")}
@@ -679,6 +677,7 @@ export default function Invoices() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>
@@ -686,14 +685,14 @@ export default function Invoices() {
       {/* Invoice Detail Modal */}
       {selectedInvoice && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
           onClick={() => setSelectedInvoice(null)}
         >
           <div
-            className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+            className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white rounded-t-3xl sticky top-0 z-10">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-6 text-white rounded-t-2xl sm:rounded-t-3xl sticky top-0 z-10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <FileText className="size-7" />
@@ -714,7 +713,7 @@ export default function Invoices() {
                 </button>
               </div>
             </div>
-            <div className="p-6 space-y-5">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               <div className="flex justify-between items-center">
                 <span
                   className={`px-3 py-1.5 rounded-xl text-sm font-bold ${statusColors[selectedInvoice.status]}`}
@@ -729,35 +728,21 @@ export default function Invoices() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                 <div className="col-span-2">
                   <p className="text-slate-500 text-xs">Buyer</p>
                   <p className="font-bold">
-                    {selectedInvoice.buyer?.name ||
-                      selectedInvoice.buyerName ||
-                      "N/A"}
+                    {selectedInvoice.buyerName || selectedInvoice.buyer?.name || "N/A"}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {selectedInvoice.buyer?.email ||
-                      selectedInvoice.buyerEmail ||
-                      ""}
+                    {selectedInvoice.buyerEmail || selectedInvoice.buyer?.email || ""}
                   </p>
-                  {(selectedInvoice.buyer?.address ||
-                    selectedInvoice.buyerAddress) && (
+                                    {(selectedInvoice.buyerAddress || selectedInvoice.buyer?.address) && (
                     <p className="text-xs text-slate-500 mt-0.5">
                       {[
-                        (
-                          selectedInvoice.buyer?.address ||
-                          selectedInvoice.buyerAddress
-                        )?.street,
-                        (
-                          selectedInvoice.buyer?.address ||
-                          selectedInvoice.buyerAddress
-                        )?.city,
-                        (
-                          selectedInvoice.buyer?.address ||
-                          selectedInvoice.buyerAddress
-                        )?.postcode,
+                        (selectedInvoice.buyerAddress || selectedInvoice.buyer?.address)?.street,
+                        (selectedInvoice.buyerAddress || selectedInvoice.buyer?.address)?.city,
+                        (selectedInvoice.buyerAddress || selectedInvoice.buyer?.address)?.postcode,
                       ]
                         .filter(Boolean)
                         .join(", ")}
@@ -898,15 +883,15 @@ export default function Invoices() {
       {/* Generate Invoice Modal */}
       {showGenerateModal && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
           onClick={() => setShowGenerateModal(false)}
         >
           <div
-            className="bg-white rounded-3xl w-full max-w-xl shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-xl shadow-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white rounded-t-3xl sticky top-0 z-10">
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 sm:p-6 text-white rounded-t-2xl sm:rounded-t-3xl sticky top-0 z-10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="size-12 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -928,7 +913,7 @@ export default function Invoices() {
               </div>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               {/* Property Selection */}
               <div>
                 <label className="block text-sm font-black text-slate-800 mb-2">

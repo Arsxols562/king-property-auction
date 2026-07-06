@@ -66,15 +66,15 @@ export default function AddUserModal({ onClose, onSuccess }: { onClose: () => vo
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-white/60 animate-in zoom-in-95 duration-300">
-        <div className={`sticky top-0 bg-gradient-to-br ${theme.primary} px-8 py-6 rounded-t-3xl border-b-2 border-white/20`}>
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-white/60">
+        <div className={`sticky top-0 bg-gradient-to-br ${theme.primary} px-4 sm:px-8 py-4 sm:py-6 rounded-t-2xl sm:rounded-t-3xl border-b-2 border-white/20`}>
           <div className="flex items-center justify-between">
-            <div><h2 className="text-3xl font-black text-white mb-2">Add New User</h2><p className="text-white/90 font-medium">Create a new user account</p></div>
+            <div><h2 className="text-xl sm:text-3xl font-black text-white mb-1 sm:mb-2">Add New User</h2><p className="text-sm text-white/90 font-medium">Create a new user account</p></div>
             <button onClick={onClose} title="Close" className="size-10 rounded-xl bg-white/20 backdrop-blur-md hover:bg-white/30 flex items-center justify-center transition-all border border-white/30 hover:scale-110"><X className="size-5 text-white" /></button>
           </div>
         </div>
-        <form className="p-8 space-y-6" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-4 sm:space-y-6">
           
           <div className="space-y-4">
             <h3 className="text-xl font-black text-slate-900 flex items-center gap-2"><Users className="size-6 text-blue-600" />Personal Information</h3>

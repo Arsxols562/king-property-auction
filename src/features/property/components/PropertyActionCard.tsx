@@ -27,6 +27,7 @@ interface PropertyActionCardProps {
   onEnquire: () => void;
   onOfferNow?: () => void;
   isOwnProperty?: boolean;
+  user?: any;
 }
 
 // Helper: Load image from URL as base64 for PDF
@@ -69,6 +70,7 @@ export default function PropertyActionCard({
   isAuthenticated,
   onOfferNow,
   isOwnProperty = false,
+  user,
 }: PropertyActionCardProps) {
   const handleDownloadBrochure = async () => {
     const { jsPDF } = await import("jspdf");
@@ -580,7 +582,7 @@ export default function PropertyActionCard({
         </a>
       )}
 
-      {((isLiveNow || isAuctionType || isDirectSale) && !isCompleted && !isOwnProperty) && (
+      {((isLiveNow || isAuctionType || isDirectSale) && !isCompleted && !isOwnProperty && user?.role !== "admin") && (
         <button
           onClick={onOfferNow}
           className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-black text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-2 text-center"

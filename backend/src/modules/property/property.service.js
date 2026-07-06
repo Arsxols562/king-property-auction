@@ -4,6 +4,7 @@ import notificationService, {
 } from "../notifications/trigger.service.js";
 import Auction from "../auction/auction.model.js";
 import cache from "../../utils/cache.js";
+import User from "../user/user.model.js";
 
 export const createProperty = async (propertyData, userId) => {
   const property = await Property.create({
@@ -25,7 +26,8 @@ export const createProperty = async (propertyData, userId) => {
 
 export const getProperties = async (query = {}) => {
   const cacheKey = `properties:${JSON.stringify(query)}`;
-  if (!query.noCache) {
+  // Don't cache search queries - results change too frequently
+  if (!query.noCache && !query.search) {
     const cached = await cache.get(cacheKey);
     if (cached) return cached;
   }
@@ -64,16 +66,76 @@ export const getProperties = async (query = {}) => {
   if (listingType) filter.listingType = listingType;
   if (city) filter["location.city"] = city;
 
-
-  // Search filter
+  // Search filter - searches across ALL columns
   if (query.search) {
-    const searchWords = query.search.split(/[\s,]+/).filter(w => w.length > 1);
-    const searchRegex = new RegExp(searchWords.join("|"), "i");
-    filter.$or = [
-      { "location.city": searchRegex },
-      { "location.area": searchRegex },
-      { "location.postalCode": searchRegex },
-    ];
+    const term = query.search.trim();
+    const isLotSearch = /^[a-f0-9]{2,24}$/i.test(term);
+
+    if (!isLotSearch) {
+      const searchRegex = new RegExp(
+        term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        "i",
+      );
+      const numericSearch = !isNaN(Number(term)) ? Number(term) : null;
+
+      // Search for matching users first (for owner name/email search)
+      const matchingUsers = await User.find({
+        $or: [
+          { name: searchRegex },
+          { email: searchRegex },
+          { phone: searchRegex },
+        ],
+      }).select("_id");
+      const matchingUserIds = matchingUsers.map((u) => u._id);
+
+      filter.$or = [
+        // Property fields
+        { propertyTitle: searchRegex },
+        { propertyDescription: searchRegex },
+        { propertyType: searchRegex },
+        { propertyStatus: searchRegex },
+        { approvalStatus: searchRegex },
+        { listingType: searchRegex },
+        { propertyCategory: searchRegex },
+        { propertyID: searchRegex },
+        // Location fields
+        { "location.city": searchRegex },
+        { "location.area": searchRegex },
+        { "location.state": searchRegex },
+        { "location.streetAddress": searchRegex },
+        { "location.postalCode": searchRegex },
+        { "location.country": searchRegex },
+        // Specifications
+        { "specifications.furnishedStatus": searchRegex },
+        // Legal
+        { "legalInfo.ownershipType": searchRegex },
+        { "legalInfo.solicitorDetails.name": searchRegex },
+        { "legalInfo.solicitorDetails.firmName": searchRegex },
+        { "legalInfo.solicitorDetails.email": searchRegex },
+        // Seller/Agent info
+        { "sellerInfo.agentName": searchRegex },
+        { "sellerInfo.agentContact": searchRegex },
+        // Owner (createdBy)
+        ...(matchingUserIds.length > 0
+          ? [{ createdBy: { $in: matchingUserIds } }]
+          : []),
+      ];
+
+      // Numeric search for price fields
+      if (numericSearch !== null) {
+        filter.$or.push(
+          { "pricing.startingAuctionPrice": numericSearch },
+          { "pricing.reservePrice": numericSearch },
+          { "pricing.buyNowPrice": numericSearch },
+          { "pricing.estimatedMarketValue": numericSearch },
+          { currentBid: numericSearch },
+          { soldPrice: numericSearch },
+        );
+      }
+    } else {
+      // Lot # search - fetch all and filter by _id ending
+      filter._isLotSearch = term.toLowerCase();
+    }
   }
 
   if (query.location) {
@@ -98,8 +160,6 @@ export const getProperties = async (query = {}) => {
     if (maxBeds) filter["specifications.bedrooms"].$lte = parseInt(maxBeds);
   }
 
-
-
   if (query.auctionSlug) {
     // Find the auction by slug, then filter properties by its property IDs
     const Auction = (await import("../auction/auction.model.js")).default;
@@ -111,21 +171,40 @@ export const getProperties = async (query = {}) => {
 
   const skip = (page - 1) * limit;
 
+  // Remove custom filter keys before querying
+  const cleanFilter = { ...filter };
+  const isLotSearch = cleanFilter._isLotSearch;
+  delete cleanFilter._searchTerm;
+  delete cleanFilter._isLotSearch;
+
   const [properties, total] = await Promise.all([
-    Property.find(filter)
+    Property.find(cleanFilter)
       .select(
-        "propertyTitle slug propertyType listingType propertyStatus approvalStatus location pricing specifications media auctionDetails currentBid totalBids featured soldPrice soldTo createdBy winningBidder createdAt updatedAt legalInfo propertyID propertyDescription termsOfSale",
+        "propertyTitle slug propertyType listingType propertyStatus approvalStatus location pricing specifications media auctionDetails currentBid totalBids featured soldPrice soldTo createdBy winningBidder createdAt updatedAt legalInfo propertyID propertyDescription termsOfSale sellerInfo",
       )
       .sort(sortBy)
       .skip(skip)
       .limit(limit)
       .populate("createdBy", "name email phone agentDetails")
       .populate("winningBidder", "name email"),
-    Property.countDocuments(filter),
+    Property.countDocuments(cleanFilter),
   ]);
 
+  // Post-filter for Lot # search (since _id substring matching is limited in MongoDB $or)
+  let filteredProperties = properties;
+  if (isLotSearch) {
+    filteredProperties = properties.filter((p) => {
+      const lotNo = (
+        p.propertyID ||
+        p._id?.toString()?.slice(-6) ||
+        ""
+      ).toLowerCase();
+      return lotNo.includes(isLotSearch);
+    });
+  }
+
   const result = {
-    properties,
+    properties: filteredProperties,
     pagination: {
       page,
       limit,
@@ -134,8 +213,10 @@ export const getProperties = async (query = {}) => {
     },
   };
 
-  // Cache for 10 seconds (short TTL — bids and status change frequently)
-  await cache.set(cacheKey, result, 10);
+  // Cache for 10 seconds (skip for search queries)
+  if (!query.search) {
+    await cache.set(cacheKey, result, 10);
+  }
 
   return result;
 };
@@ -164,11 +245,11 @@ export const updateProperty = async (id, updateData) => {
     }
   }
 
-   const property = await Property.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    });
-    if (!property) throw new Error("Property not found");
+  const property = await Property.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  });
+  if (!property) throw new Error("Property not found");
   if (!property) throw new Error("Property not found");
   await cache.delPattern("properties:*");
   await cache.del(`property:${id}`);

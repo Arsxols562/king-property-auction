@@ -352,7 +352,7 @@ export default function PropertyDetails() {
     if (!bidAmount || !property || !matchingAuction) return;
     const amount = parseFloat(bidAmount);
     if (amount < nextMinBid) {
-      showNotification(`Minimum bid is ${formatPrice(nextMinBid)}`, "error");
+      showNotification(` Bid must be at least ${formatPrice(nextMinBid)}`, "error");
       return;
     }
 
@@ -598,6 +598,7 @@ export default function PropertyDetails() {
           <PropertyActionCard
             isAuthenticated={isAuthenticated}
             property={property}
+            user={user}
             matchingAuction={matchingAuction}
             isLiveNow={isLiveNow}
             isCompleted={isCompleted}

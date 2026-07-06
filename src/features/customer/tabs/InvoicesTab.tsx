@@ -123,29 +123,30 @@ export default function InvoicesTab() {
     doc.text(`Invoice: ${invoice.invoiceNumber}`, m, y);
     y += 8;
 
-    // Buyer info in PDF
-    const buyerAddressData = invoice.buyer?.address || invoice.buyerAddress;
-    const buyerAddr = buyerAddressData
-      ? [buyerAddressData.street, buyerAddressData.city, buyerAddressData.postcode].filter(Boolean).join(", ")
+       // Buyer info in PDF
+    const buyerName = invoice.buyerName || invoice.buyer?.name;
+    const buyerEmail = invoice.buyerEmail || invoice.buyer?.email;
+    const buyerAddr = invoice.buyerAddress || invoice.buyer?.address;
+    const buyerAddrStr = buyerAddr
+      ? [buyerAddr.street, buyerAddr.city, buyerAddr.postcode].filter(Boolean).join(", ")
       : "";
-    if (invoice.buyer?.name) {
+    if (buyerName) {
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
       doc.text("Buyer:", m, y);
       y += 5;
       doc.setFont("helvetica", "normal");
-      doc.text(`  ${invoice.buyer?.name || invoice.buyerName || "N/A"}`, m, y);
+      doc.text(`  ${buyerName}`, m, y);
       y += 5;
-      if (invoice.buyer.email) {
-        doc.text(`  ${invoice.buyer?.email || invoice.buyerEmail || ""}`, m, y);
+      if (buyerEmail) {
+        doc.text(`  ${buyerEmail}`, m, y);
         y += 5;
       }
-      if (buyerAddr) {
+      if (buyerAddrStr) {
         doc.setFontSize(8);
-        doc.text(`  ${buyerAddr}`, m, y);
+        doc.text(`  ${buyerAddrStr}`, m, y);
         y += 5;
       }
-      y += 3;
     }
 
     doc.setFontSize(10);
@@ -359,13 +360,14 @@ export default function InvoicesTab() {
                   </td>
                   {isSellerView && (
                     <td className="px-4 py-3 text-sm">
-                      <p className="font-semibold text-slate-900">{inv.buyer?.name || inv.buyerName || "N/A"}</p>
-                      {(inv.buyer?.address || inv.buyerAddress) && (
-                        <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="font-semibold text-slate-900">{inv.buyerName || inv.buyer?.name || "N/A"}</p>
+                      <p className="text-xs text-slate-500">{inv.buyerEmail || inv.buyer?.email || ""}</p>
+                      {(inv.buyerAddress || inv.buyer?.address) && (
+                        <p className="text-xs text-slate-400 mt-0.5">
                           {[
-                            (inv.buyer?.address || inv.buyerAddress)?.street,
-                            (inv.buyer?.address || inv.buyerAddress)?.city,
-                            (inv.buyer?.address || inv.buyerAddress)?.postcode,
+                            (inv.buyerAddress || inv.buyer?.address)?.street,
+                            (inv.buyerAddress || inv.buyer?.address)?.city,
+                            (inv.buyerAddress || inv.buyer?.address)?.postcode,
                           ].filter(Boolean).join(", ")}
                         </p>
                       )}
@@ -465,21 +467,21 @@ export default function InvoicesTab() {
                   </p>
                 </div>
 
-                {isSellerView && selectedInvoice.buyer && (
+                {isSellerView && (selectedInvoice.buyer || selectedInvoice.buyerName) && (
                   <div className="bg-slate-50 rounded-xl p-3 col-span-2">
                     <p className="text-xs text-slate-500">Buyer</p>
                     <p className="font-bold text-slate-900">
-                      {selectedInvoice.buyer?.name}
+                      {selectedInvoice.buyerName || selectedInvoice.buyer?.name || "N/A"}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {selectedInvoice.buyer?.email}
+                      {selectedInvoice.buyerEmail || selectedInvoice.buyer?.email || ""}
                     </p>
-                  {(selectedInvoice.buyer?.address || selectedInvoice.buyerAddress) && (
+                  {(selectedInvoice.buyerAddress || selectedInvoice.buyer?.address) && (
                     <p className="text-xs text-slate-500 mt-0.5">
                       {[
-                        (selectedInvoice.buyer?.address || selectedInvoice.buyerAddress)?.street,
-                        (selectedInvoice.buyer?.address || selectedInvoice.buyerAddress)?.city,
-                        (selectedInvoice.buyer?.address || selectedInvoice.buyerAddress)?.postcode,
+                        (selectedInvoice.buyerAddress || selectedInvoice.buyer?.address)?.street,
+                        (selectedInvoice.buyerAddress || selectedInvoice.buyer?.address)?.city,
+                        (selectedInvoice.buyerAddress || selectedInvoice.buyer?.address)?.postcode,
                       ].filter(Boolean).join(", ")}
                     </p>
                   )}

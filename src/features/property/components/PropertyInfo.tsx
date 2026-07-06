@@ -342,21 +342,9 @@ export default function PropertyInfo({
               ) : matchingAuction.status === "live" ? (
                 <>
                   <div className="flex justify-between text-sm font-semibold">
-                    <span className="text-slate-600">Next Min Bid</span>
-                    <span className="text-slate-900 font-bold">
-                      {formatPrice(nextMinBid)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm font-semibold">
-                    <span className="text-slate-600">Bid Increment</span>
-                    <span className="text-slate-900 font-bold">
-                      {formatPrice(bidIncrement)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm font-semibold">
                     <span className="text-slate-600">Total Bids</span>
                     <span className="text-slate-900 font-bold">
-                      {property.totalBids || 0}
+                      {property.totalBids > 0 ? `${property.totalBids} bid${property.totalBids !== 1 ? 's' : ''}` : 'No bids placed yet'}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-semibold">

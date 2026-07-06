@@ -128,12 +128,12 @@ export default function PropertyOffers() {
   return (
     <AdminLayout activeTab="property-offers" onTabChange={() => {}}>
       <div>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
-            <h2 className="text-3xl font-black text-slate-900">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">
               Property Offers
             </h2>
-            <p className="text-slate-600 font-medium mt-1">
+            <p className="text-sm sm:text-base text-slate-600 font-medium">
               Review and respond to property offers
             </p>
           </div>
@@ -173,7 +173,8 @@ export default function PropertyOffers() {
               <p className="font-bold">No offers yet</p>
             </div>
           ) : (
-            <table className="w-full">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[800px]">
               <thead className="bg-gradient-to-r from-purple-600 to-indigo-600">
                 <tr>
                   {[
@@ -314,6 +315,7 @@ export default function PropertyOffers() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>
@@ -321,19 +323,19 @@ export default function PropertyOffers() {
       {/* Offer Detail Modal */}
       {selectedOffer && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
           onClick={() => setSelectedOffer(null)}
         >
           <div
-            className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+            className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white rounded-t-3xl sticky top-0 z-10">
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 sm:p-6 text-white rounded-t-2xl sm:rounded-t-3xl sticky top-0 z-10">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FileText className="size-7" />
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <FileText className="size-5 sm:size-7" />
                   <div>
-                    <h3 className="text-xl font-black">Offer Details</h3>
+                    <h3 className="text-lg sm:text-xl font-black">Offer Details</h3>
                     <p className="text-white/80 text-sm">
                       {selectedOffer.property?.propertyTitle}
                     </p>
@@ -348,7 +350,7 @@ export default function PropertyOffers() {
               </div>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               {/* Status + Amount */}
               <div className="flex items-center justify-between">
                 <span
@@ -366,7 +368,7 @@ export default function PropertyOffers() {
                 <h4 className="font-black text-slate-900 text-sm">
                   Offeror Information
                 </h4>
-                <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                   <div className="flex items-center gap-2">
                     <Mail className="size-4 text-slate-400" />
                     <span>{selectedOffer.email}</span>
@@ -493,11 +495,11 @@ export default function PropertyOffers() {
       {/* Price Change Request Modal */}
       {showPriceRequest && priceRequestOffer && (
         <div
-          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-2 sm:p-4"
           onClick={() => setShowPriceRequest(false)}
         >
           <div
-            className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6"
+            className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-md shadow-2xl p-4 sm:p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-xl font-black text-slate-900 mb-4">

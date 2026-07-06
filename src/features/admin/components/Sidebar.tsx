@@ -16,6 +16,7 @@ import {
   CheckCircle,
   FileChartColumn,
   FileText,
+  X,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { useTheme } from "../../../app/hooks/useTheme";
@@ -91,9 +92,11 @@ const menuItems = [
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+export default function Sidebar({ activeTab, onTabChange, mobileOpen = false, onMobileClose }: SidebarProps) {
   const navigate = useNavigate();
   const theme = useTheme();
   const { logout } = useAuthStore();
@@ -116,94 +119,122 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     }
   };
 
-  return (
-    <aside className="w-72 bg-white/80 backdrop-blur-xl border-r-2 border-white/60 flex flex-col shadow-xl h-screen sticky top-0 overflow-y-auto flex-shrink-0">
-      <div className="p-6 border-b-2 border-slate-100">
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-3 group"
-          title="Back to Website"
-        >
-          <div
-            className={`size-12 rounded-2xl bg-gradient-to-br ${theme.primary} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}
+    return (
+    <>
+      {/* Mobile overlay - only when drawer open, below lg */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onMobileClose}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`
+          w-56 lg:w-60 xl:w-64 max-w-[85vw] bg-white/80 backdrop-blur-xl border-r-2 border-white/60
+          flex flex-col shadow-xl h-screen overflow-hidden
+          fixed top-0 left-0 z-50 transition-transform duration-300 ease-in-out
+          ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0 lg:sticky lg:z-auto
+        `}
+      >
+          <div style={{ zoom: '0.8' }} className="flex flex-col flex-1 overflow-hidden">
+          <div className="p-6 border-b-2 border-slate-100 flex items-center gap-2">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-3 group flex-1 min-w-0"
+            title="Back to Website"
           >
-            <LayoutDashboard className="size-6 text-white" />
-          </div>
-          <div className="text-left">
-            <h1 className="font-black text-slate-900">King Property Auction</h1>
-            <p className="text-xs text-slate-600 font-bold">Admin Portal</p>
-          </div>
-        </button>
-      </div>
-
-      <nav className="flex-1 p-4 overflow-y-auto">
-        <div className="space-y-2">
-          <p className="text-xs font-black text-slate-500 uppercase tracking-wider px-4 mb-3">
-            Main Navigation
-          </p>
-          {(() => {
-            if (dbItems.length === 0) return menuItems;
-            // Match by URL so new hardcoded items not yet in DB still appear
-            const dbUrls = new Set(
-              dbItems.map((i: any) => i.url || `/admin/${i.id}`),
-            );
-            const hardcodedNotInDb = menuItems.filter((m) => {
-              const url = m.path || `/admin/${m.id}`;
-              return !dbUrls.has(url);
-            });
-            return [...dbItems, ...hardcodedNotInDb];
-          })().map((item: any) => {
-            const isDbItem = !!item._id;
-            const icons: any = LucideIcons;
-            const Icon = isDbItem
-              ? icons[item.icon] || icons.FileText
-              : item.icon;
-
-            const itemPath = isDbItem
-              ? item.url
-              : item.path || `/admin/${item.id}`;
-            const isActive =
-              window.location.pathname === itemPath ||
-              window.location.pathname.startsWith(itemPath + "/");
-
-            return (
-              <button
-                key={item.id || item._id}
-                onClick={() => {
-                  if (isDbItem && item.url) {
-                    navigate(item.url);
-                  } else {
-                    handleNavigation(item);
-                  }
-                }}
-                title={item.label}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? `bg-gradient-to-r ${theme.secondary} text-white shadow-lg`
-                    : "text-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                <Icon className="size-5" />
-                {item.label}
-                {item.badge && (
-                  <span className="ml-auto px-2 py-0.5 bg-red-500 text-white text-[10px] rounded-full font-black">
-                    {item.badgeLabel || "NEW"}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+            <div
+              className={`size-12 rounded-2xl bg-gradient-to-br ${theme.primary} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0`}
+            >
+              <LayoutDashboard className="size-6 text-white" />
+            </div>
+            <div className="text-left min-w-0">
+              <h1 className="font-black text-slate-900 text-sm leading-tight truncate">King Property Auction</h1>
+              <p className="text-xs text-slate-600 font-bold">Admin Portal</p>
+            </div>
+          </button>
+          <button
+            onClick={onMobileClose}
+            className="lg:hidden p-2 hover:bg-slate-100 rounded-xl flex-shrink-0"
+            aria-label="Close menu"
+          >
+            <X className="size-5 text-slate-500" />
+          </button>
         </div>
-      </nav>
 
-      <div className="p-4 border-t-2 border-slate-100 space-y-2">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl text-sm font-bold transition-all"
-        >
-          <LogOut className="size-5" /> Logout
-        </button>
-      </div>
-    </aside>
+        <nav className="flex-1 p-4 overflow-y-auto">
+          <div className="space-y-2">
+            <p className="text-xs font-black text-slate-500 uppercase tracking-wider px-4 mb-3">
+              Main Navigation
+            </p>
+            {(() => {
+              if (dbItems.length === 0) return menuItems;
+              const dbUrls = new Set(
+                dbItems.map((i: any) => i.url || `/admin/${i.id}`),
+              );
+              const hardcodedNotInDb = menuItems.filter((m) => {
+                const url = m.path || `/admin/${m.id}`;
+                return !dbUrls.has(url);
+              });
+              return [...dbItems, ...hardcodedNotInDb];
+            })().map((item: any) => {
+              const isDbItem = !!item._id;
+              const icons: any = LucideIcons;
+              const Icon = isDbItem
+                ? icons[item.icon] || icons.FileText
+                : item.icon;
+
+              const itemPath = isDbItem
+                ? item.url
+                : item.path || `/admin/${item.id}`;
+              const isActive =
+                window.location.pathname === itemPath ||
+                window.location.pathname.startsWith(itemPath + "/");
+
+              return (
+                <button
+                  key={item.id || item._id}
+                  onClick={() => {
+                    if (isDbItem && item.url) {
+                      navigate(item.url);
+                    } else {
+                      handleNavigation(item);
+                    }
+                    onMobileClose?.();
+                  }}
+                  title={item.label}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                    isActive
+                      ? `bg-gradient-to-r ${theme.secondary} text-white shadow-lg`
+                      : "text-slate-700 hover:bg-slate-100"
+                  }`}
+                >
+                  <Icon className="size-5" />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {item.badge && (
+                    <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] rounded-full font-black">
+                      {item.badgeLabel || "NEW"}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        <div className="p-4 border-t-2 border-slate-100 space-y-2">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl text-sm font-bold transition-all"
+          >
+            <LogOut className="size-5" /> Logout
+          </button>
+        </div>
+        </div>
+      </aside>
+    </>
   );
 }

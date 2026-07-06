@@ -45,9 +45,9 @@ export default function Analytics() {
 
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-3xl font-black text-slate-900 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1 sm:mb-2">
               Analytics & Reports
             </h2>
             <p className="text-slate-600 font-medium">
@@ -56,9 +56,9 @@ export default function Analytics() {
           </div>
           <button
             onClick={() => setShowGenerateReportModal(true)}
-            className={`px-6 py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-bold shadow-lg hover:scale-105 transition-all flex items-center gap-2`}
+            className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors flex items-center gap-2 w-fit"
           >
-            <FileText className="size-5" />
+            <FileText className="size-4" />
             Generate Report
           </button>
         </div>
@@ -89,19 +89,12 @@ export default function Analytics() {
 
       {/* Generate Report Modal */}
       {showGenerateReportModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-white/60">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-white/60">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 px-8 py-6 rounded-t-3xl border-b-2 border-white/20">
+                        <div className={`sticky top-0 bg-gradient-to-r ${theme.primary} px-4 sm:px-8 py-4 sm:py-6 rounded-t-2xl sm:rounded-t-3xl border-b-2 border-white/20`}>
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-3xl font-black text-white mb-2">
-                    Generate Report
-                  </h2>
-                  <p className="text-white/90 font-medium">
-                    Create custom analytics and performance reports
-                  </p>
-                </div>
+                <div><h2 className="text-xl sm:text-3xl font-black text-white mb-1 sm:mb-2">Generate Report</h2><p className="text-sm text-white/90 font-medium">Create custom analytics and performance reports</p></div>
                 <button
                   onClick={() => setShowGenerateReportModal(false)}
                   className="size-10 rounded-xl bg-white/20 backdrop-blur-md hover:bg-white/30 flex items-center justify-center transition-all border border-white/30 hover:scale-110"

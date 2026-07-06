@@ -8,7 +8,11 @@ interface MenuManagerTabProps {
   onEditMenu: (menu: any) => void;
 }
 
-export default function MenuManagerTab({ theme, onCreateMenu, onEditMenu }: MenuManagerTabProps) {
+export default function MenuManagerTab({
+  theme,
+  onCreateMenu,
+  onEditMenu,
+}: MenuManagerTabProps) {
   const { data: menusData = [], isLoading } = useQuery({
     queryKey: ["menus-list"],
     queryFn: async () => {
@@ -19,18 +23,20 @@ export default function MenuManagerTab({ theme, onCreateMenu, onEditMenu }: Menu
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 mb-2">Menu Manager</h2>
-          <p className="text-slate-600 font-medium">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1 sm:mb-2">
+            Menu Manager
+          </h2>
+          <p className="text-sm sm:text-base text-slate-600 font-medium">
             Create and manage dynamic navigation menus
           </p>
         </div>
         <button
           onClick={onCreateMenu}
-          className={`px-6 py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-bold shadow-lg hover:scale-105 transition-all flex items-center gap-2`}
+          className={`px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl text-sm font-bold shadow-lg hover:scale-105 transition-all flex items-center gap-2 flex-shrink-0`}
         >
-          <Plus className="size-5" />
+          <Plus className="size-4 sm:size-5" />
           Create Menu
         </button>
       </div>
@@ -38,14 +44,21 @@ export default function MenuManagerTab({ theme, onCreateMenu, onEditMenu }: Menu
       {isLoading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white/80 rounded-2xl p-6 h-40 animate-pulse" />
+            <div
+              key={i}
+              className="bg-white/80 rounded-2xl p-6 h-40 animate-pulse"
+            />
           ))}
         </div>
       ) : (menusData as any[]).length === 0 ? (
         <div className="text-center py-16 bg-white/80 backdrop-blur-xl rounded-3xl border-2 border-white/60 shadow-xl">
           <Menu className="size-16 text-slate-300 mx-auto mb-4" />
-          <h3 className="text-xl font-black text-slate-700 mb-2">No Menus Yet</h3>
-          <p className="text-slate-500 mb-6">Create your first navigation menu to get started</p>
+          <h3 className="text-xl font-black text-slate-700 mb-2">
+            No Menus Yet
+          </h3>
+          <p className="text-slate-500 mb-6">
+            Create your first navigation menu to get started
+          </p>
           <button
             onClick={onCreateMenu}
             className={`px-6 py-3 bg-gradient-to-r ${theme.secondary} text-white rounded-xl font-bold hover:scale-105 transition-all`}
@@ -61,10 +74,16 @@ export default function MenuManagerTab({ theme, onCreateMenu, onEditMenu }: Menu
               className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-white/60 shadow-lg"
             >
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-xl font-black text-slate-900">{menu.name}</h4>
-                <span className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
-                  menu.status === "active" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"
-                }`}>
+                <h4 className="text-xl font-black text-slate-900">
+                  {menu.name}
+                </h4>
+                <span
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
+                    menu.status === "active"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-slate-100 text-slate-600"
+                  }`}
+                >
                   {menu.status === "active" ? "Active" : "Inactive"}
                 </span>
               </div>

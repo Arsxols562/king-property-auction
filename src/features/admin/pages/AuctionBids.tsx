@@ -130,34 +130,54 @@ export default function AuctionBids() {
     >
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-3xl font-black text-slate-900">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
               Auction Bidding Report
             </h2>
-            <p className="text-slate-600 font-medium">
+            <p className="text-sm sm:text-base text-slate-600 font-medium">
               View all properties, bidders and results per auction
             </p>
           </div>
           {selectedAuctionId && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 sm:hidden">
               <button
                 onClick={exportCSV}
-                className="px-5 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-all flex items-center gap-2"
+                className="px-2.5 py-2 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition-all flex items-center gap-1.5"
               >
-                <Download className="size-4" />
+                <Download className="size-3.5" />
                 Export CSV
               </button>
               <button
                 onClick={exportPDF}
-                className="px-5 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-all flex items-center gap-2"
+                className="px-2.5 py-2 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition-all flex items-center gap-1.5"
               >
-                <FileText className="size-4" />
+                <FileText className="size-3.5" />
                 Export PDF
               </button>
             </div>
           )}
         </div>
+
+        {/* Export Buttons - Desktop */}
+        {selectedAuctionId && (
+          <div className="hidden sm:flex items-center gap-2 justify-end">
+            <button
+              onClick={exportCSV}
+              className="px-5 py-3 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-all flex items-center gap-2"
+            >
+              <Download className="size-4" />
+              Export CSV
+            </button>
+            <button
+              onClick={exportPDF}
+              className="px-5 py-3 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-all flex items-center gap-2"
+            >
+              <FileText className="size-4" />
+              Export PDF
+            </button>
+          </div>
+        )}
 
         {/* Auction Selector */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">

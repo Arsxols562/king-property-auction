@@ -25,26 +25,22 @@ export default function PropertiesTable() {
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
+  const searchParam = search || undefined;
+  const typeParam = typeFilter || undefined;
+  const statusParam = statusFilter || undefined;
+
   const { data: lotsData, isLoading } = useGetProperties({
     page,
     pageSize: 10,
     approvalStatus: "all",
+    search: searchParam,
+    type: typeParam,
+    status: statusParam,
   });
   const properties = lotsData?.data || [];
   const total = lotsData?.total || 0;
   const totalPages = lotsData?.totalPages || 1;
 
-  const filtered = properties.filter((p: any) => {
-    if (
-      search &&
-      !p.propertyTitle?.toLowerCase().includes(search.toLowerCase()) &&
-      !p.location?.city?.toLowerCase().includes(search.toLowerCase())
-    )
-      return false;
-    if (typeFilter && p.propertyType !== typeFilter) return false;
-    if (statusFilter && p.propertyStatus !== statusFilter) return false;
-    return true;
-  });
 
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
@@ -67,7 +63,7 @@ export default function PropertiesTable() {
   return (
     <div>
       <FilterBar
-        searchPlaceholder="Search by title or city..."
+        searchPlaceholder="Search by title, location, owner, type, status, price, lot#"
         searchValue={search}
         onSearchChange={(v) => {
           setSearch(v);
@@ -141,14 +137,14 @@ export default function PropertiesTable() {
                     Loading properties...
                   </td>
                 </tr>
-              ) : filtered.length === 0 ? (
+              ) : properties.length === 0 ? (
                 <tr>
                   <td colSpan={12} className="text-center py-8 text-slate-500">
                     No properties found.
                   </td>
                 </tr>
               ) : (
-                filtered.map((property: any) => (
+                properties.map((property: any) => (
                   <tr
                     key={property._id}
                     className="hover:bg-slate-50 transition-colors"

@@ -89,23 +89,11 @@ export default function BidModal({
         {/* Bid Info */}
         <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-5 mb-6 space-y-3">
           <div className="flex justify-between">
-            <span className="text-xs font-semibold text-slate-600">
-              Current Bid
+            <span className="text-sm font-bold text-slate-600">
+              {property.totalBids > 0 ? "Current Bid" : "Guide Price"}
             </span>
             <span className="text-xl font-black text-green-600">
               {formatPrice(currentBid)}
-            </span>
-          </div>
-          <div className="flex justify-between text-xs font-semibold">
-            <span className="text-slate-500">Next Min Bid</span>
-            <span className="text-slate-900 font-bold">
-              {formatPrice(nextMinBid)}
-            </span>
-          </div>
-          <div className="flex justify-between text-xs font-semibold">
-            <span className="text-slate-500">Bid Increment</span>
-            <span className="text-slate-900 font-bold">
-              {formatPrice(bidIncrement)}
             </span>
           </div>
           
@@ -145,13 +133,13 @@ export default function BidModal({
                   placeholder="0"
                 />
               </div>
-              {bidAmount && Number(bidAmount) < nextMinBid ? (
+              {/* {bidAmount && Number(bidAmount) < nextMinBid ? (
                 <p className="text-xs text-red-600 font-bold mt-1">⚠️ Bid must be at least {formatPrice(nextMinBid)}</p>
               ) : (
                 <p className="text-xs text-slate-500 mt-2">
                   💡 Bid must be at least {formatPrice(nextMinBid)}
                 </p>
-              )}
+              )} */}
             </div>
 
             {/* Auto-Bid Toggle */}

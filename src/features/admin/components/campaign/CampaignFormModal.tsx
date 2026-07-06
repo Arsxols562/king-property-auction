@@ -291,13 +291,13 @@ export default function CampaignFormModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-y-auto">
         {/* Header */}
         <div
-          className={`bg-gradient-to-r ${theme.primary} p-6 flex items-center justify-between text-white sticky top-0 z-10 rounded-t-3xl`}
+          className={`bg-gradient-to-r ${theme.primary} p-4 sm:p-6 flex items-center justify-between text-white sticky top-0 z-10 rounded-t-2xl sm:rounded-t-3xl`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Mail className="size-6" />
             <h2 className="text-xl font-black">
               {editData ? "Edit" : "Create"} Campaign
@@ -344,9 +344,9 @@ export default function CampaignFormModal({
           </div>
         )}
 
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           {/* Row 1: Name, Type, Preset */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">
                 Campaign Name *
@@ -462,7 +462,7 @@ export default function CampaignFormModal({
             </div>
 
             {/* Property & Auction Selectors */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <PropertySelector
                 onSelect={(title: string) => {
                   if (focusedFieldIndex !== null) {

@@ -569,17 +569,12 @@ export default function ViewAllLots() {
                             {formatPrice(currentBid, lot.pricing?.currency)}
                           </p>
                         </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-500">Next Min Bid</span>
-                          <span className="font-bold text-slate-700">
-                            {formatPrice(nextMinBid, lot.pricing?.currency)}
-                          </span>
-                        </div>
+
 
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-500">Bids</span>
                           <span className="font-bold text-slate-700">
-                            {lot.totalBids || 0}
+                            {lot.totalBids > 0 ? lot.totalBids : 'No bids yet'}
                           </span>
                         </div>
                       </div>

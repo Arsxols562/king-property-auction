@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import {
-  Mail, Send, X, User, InboxIcon, CheckCheck, AlertCircle, Paperclip,
+  Mail, Send, X, User, InboxIcon, CheckCheck, AlertCircle, Paperclip, ArrowLeft
 } from "lucide-react";
 
 const priorityColors: Record<string, string> = {
@@ -15,6 +15,7 @@ interface MessageThreadProps {
   messages: any[];
   onSend: (text: string) => void;
   isSending: boolean;
+  onBack?: () => void;
   typingUsers: string[];
   onUpdateConv: (id: string, data: any) => void;
   agentRequests: any[];
@@ -27,6 +28,7 @@ export default function MessageThread({
   conversation,
   messages,
   onSend,
+  onBack,
   isSending,
   typingUsers,
   onUpdateConv,
@@ -141,9 +143,14 @@ export default function MessageThread({
         <>
           {/* Conversation header */}
           <div className="px-6 py-4 bg-white border-b border-slate-200 flex items-center justify-between shadow-sm flex-shrink-0">
-            <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
+              {onBack && (
+                <button onClick={onBack} className="md:hidden p-1.5 hover:bg-slate-100 rounded-lg">
+                  <ArrowLeft className="size-4 text-slate-600" />
+                </button>
+              )}
               <div className="size-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold">
-                {conversation.lead?.name?.charAt(0) || "?"}
+            {conversation.lead?.name?.charAt(0) || "?"}
               </div>
               <div>
                 <h3 className="font-black text-slate-900 text-sm">{conversation.subject}</h3>

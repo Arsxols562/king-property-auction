@@ -144,23 +144,19 @@ export default function AuctionFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div
-          className={`bg-gradient-to-r ${theme.primary} p-6 flex items-center justify-between text-white sticky top-0 z-10 rounded-t-3xl`}
+                    className={`bg-gradient-to-r ${theme.primary} p-4 sm:p-6 flex items-center justify-between text-white sticky top-0 z-10 rounded-t-2xl sm:rounded-t-3xl`}
         >
-          <div className="flex items-center gap-4">
-            <div className="size-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-              <Gavel className="size-6 text-white" />
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="size-10 sm:size-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0">
+              <Gavel className="size-5 sm:size-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-black">
-                {editData ? "Edit" : "Create New"} Auction
-              </h2>
-              <p className="text-sm text-white/80 font-medium">
-                Set up a new property auction event
-              </p>
+              <h2 className="text-lg sm:text-2xl font-black">{editData ? "Edit" : "Create"} Auction</h2>
+              <p className="text-xs sm:text-sm text-white/80 font-medium hidden sm:block">Set up your auction details</p>
             </div>
           </div>
           <button
@@ -172,7 +168,7 @@ export default function AuctionFormModal({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Auction Details */}
           <div className="space-y-4">
             <h3 className="text-lg font-black text-slate-900">
@@ -275,7 +271,7 @@ export default function AuctionFormModal({
 
             {/* Property grid - 2 columns, scrollable, max 30 initially */}
             <div className="border-2 border-slate-200 rounded-xl overflow-hidden">
-              <div className="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto p-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto p-3">
                 {filteredProperties.length === 0 && (
                   <p className="text-slate-500 text-sm text-center py-8 col-span-2">
                     No properties found.

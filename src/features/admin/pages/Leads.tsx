@@ -284,18 +284,18 @@ export default function Leads() {
     <AdminLayout activeTab="leads" onTabChange={() => {}}>
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-3xl font-black text-slate-900">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1 sm:mb-2">
               Leads Management
             </h2>
-            <p className="text-slate-600 font-medium mt-1">
+            <p className="text-sm sm:text-base text-slate-600 font-medium">
               CRM-style lead tracking and management
             </p>
           </div>
           <button
             onClick={exportCSV}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold hover:shadow-xl transition-all flex items-center gap-2"
+            className="px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-bold hover:shadow-xl transition-all flex items-center gap-2 w-fit"
           >
             <Download className="size-4" /> Export CSV
           </button>
@@ -327,7 +327,7 @@ export default function Leads() {
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
             <input
@@ -371,128 +371,136 @@ export default function Leads() {
 
         {/* Table */}
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl border-2 border-white/60 shadow-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-blue-600 to-indigo-600">
-              <tr>
-                {["Name", "Email", "Phone", "Type", "Status", "Date", ""].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-6 py-4 text-left text-xs font-black text-white uppercase"
-                    >
-                      {h}
-                    </th>
-                  ),
-                )}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {isLoading ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px]">
+              <thead className="bg-gradient-to-r from-blue-600 to-indigo-600">
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-500">
-                    Loading leads...
-                  </td>
-                </tr>
-              ) : leads.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-500">
-                    No leads found.
-                  </td>
-                </tr>
-              ) : (
-                leads.map((lead: any) => (
-                  <tr
-                    key={lead._id}
-                    className="hover:bg-blue-50 cursor-pointer transition-colors"
-                    onClick={() => fetchLeadDetail(lead._id)}
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="size-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs">
-                          {lead.name?.charAt(0) || "?"}
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-900 text-sm">
-                            {lead.name}
-                          </p>
-                          {lead.property && (
-                            <p className="text-xs text-slate-500">
-                              {lead.property.propertyTitle}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm flex items-center gap-1 text-slate-600">
-                      <Mail className="size-3" />
-                      {lead.email}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {lead.phone || "-"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold ${typeColors[lead.leadType] || "bg-slate-100 text-slate-700"}`}
+                  {["Name", "Email", "Phone", "Type", "Status", "Date", ""].map(
+                    (h) => (
+                      <th
+                        key={h}
+                        className="px-6 py-4 text-left text-xs font-black text-white uppercase"
                       >
-                        {typeLabels[lead.leadType] || lead.leadType}
-                      </span>
-                    </td>
+                        {h}
+                      </th>
+                    ),
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {isLoading ? (
+                  <tr>
                     <td
-                      className="px-6 py-4"
-                      onClick={(e) => e.stopPropagation()}
+                      colSpan={7}
+                      className="text-center py-12 text-slate-500"
                     >
-                      <select
-                        value={lead.status}
-                        onChange={(e) =>
-                          updateStatus.mutate({
-                            id: lead._id,
-                            status: e.target.value,
-                          })
-                        }
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer border-0 ${statusColors[lead.status] || "bg-slate-100"}`}
-                      >
-                        <option value="new">New</option>
-                        <option value="contacted">Contacted</option>
-                        <option value="qualified">Qualified</option>
-                        <option value="converted">Converted</option>
-                        <option value="closed">Closed</option>
-                      </select>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-slate-500">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="size-3" />
-                        {new Date(lead.createdAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td
-                      className="px-6 py-4"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="flex items-center gap-2">
-                        <button
-                          title="View Lead"
-                          onClick={() => fetchLeadDetail(lead._id)}
-                          className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"
-                        >
-                          <Eye className="size-4" />
-                        </button>
-                        <button
-                          title="Delete Lead"
-                          onClick={() => {
-                            if (confirm("Delete this lead?"))
-                              deleteLead.mutate(lead._id);
-                          }}
-                          className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      </div>
+                      Loading leads...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : leads.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="text-center py-12 text-slate-500"
+                    >
+                      No leads found.
+                    </td>
+                  </tr>
+                ) : (
+                  leads.map((lead: any) => (
+                    <tr
+                      key={lead._id}
+                      className="hover:bg-blue-50 cursor-pointer transition-colors"
+                      onClick={() => fetchLeadDetail(lead._id)}
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="size-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs">
+                            {lead.name?.charAt(0) || "?"}
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-900 text-sm">
+                              {lead.name}
+                            </p>
+                            {lead.property && (
+                              <p className="text-xs text-slate-500">
+                                {lead.property.propertyTitle}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm flex items-center gap-1 text-slate-600">
+                        <Mail className="size-3" />
+                        {lead.email}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {lead.phone || "-"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold ${typeColors[lead.leadType] || "bg-slate-100 text-slate-700"}`}
+                        >
+                          {typeLabels[lead.leadType] || lead.leadType}
+                        </span>
+                      </td>
+                      <td
+                        className="px-6 py-4"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <select
+                          value={lead.status}
+                          onChange={(e) =>
+                            updateStatus.mutate({
+                              id: lead._id,
+                              status: e.target.value,
+                            })
+                          }
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer border-0 ${statusColors[lead.status] || "bg-slate-100"}`}
+                        >
+                          <option value="new">New</option>
+                          <option value="contacted">Contacted</option>
+                          <option value="qualified">Qualified</option>
+                          <option value="converted">Converted</option>
+                          <option value="closed">Closed</option>
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-slate-500">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="size-3" />
+                          {new Date(lead.createdAt).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td
+                        className="px-6 py-4"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="flex items-center gap-2">
+                          <button
+                            title="View Lead"
+                            onClick={() => fetchLeadDetail(lead._id)}
+                            className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"
+                          >
+                            <Eye className="size-4" />
+                          </button>
+                          <button
+                            title="Delete Lead"
+                            onClick={() => {
+                              if (confirm("Delete this lead?"))
+                                deleteLead.mutate(lead._id);
+                            }}
+                            className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination */}
           {pagination.pages > 1 && (
@@ -536,18 +544,18 @@ export default function Leads() {
             }}
           >
             <div
-              className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
+              className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white rounded-t-3xl sticky top-0 z-10">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-6 text-white rounded-t-2xl sm:rounded-t-3xl sticky top-0 z-10">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center text-2xl font-black">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="size-12 sm:size-14 rounded-2xl bg-white/20 flex items-center justify-center text-xl sm:text-2xl font-black flex-shrink-0">
                       {selectedLead.name?.charAt(0) || "?"}
                     </div>
                     <div>
-                      <h3 className="text-2xl font-black">
+                      <h3 className="text-lg sm:text-2xl font-black">
                         {selectedLead.name}
                       </h3>
                       <div className="flex items-center gap-3 mt-1">

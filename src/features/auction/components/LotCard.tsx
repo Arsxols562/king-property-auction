@@ -125,28 +125,11 @@ export default function LotCard({
                 £{currentBid.toLocaleString()}
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-xs font-semibold text-slate-600">
-                Next Min Bid
-              </p>
-              <p className="text-lg font-bold text-slate-900">
-                £{nextMinBid.toLocaleString()}
-              </p>
-            </div>
           </div>
-          <div className="flex items-center justify-between text-xs font-semibold mb-2">
-            <span className="text-slate-500">Bid Increment</span>
-            <span className="text-slate-900">
-              £{bidIncrement.toLocaleString()}
-            </span>
-          </div>
+
           
           <div className="flex items-center justify-between mt-3 text-xs text-slate-500">
-            <span>{property.totalBids || 0} bids</span>
-            <span>
-              Starting: £
-              {(property.pricing?.startingAuctionPrice || 0).toLocaleString()}
-            </span>
+            <span>{property.totalBids > 0 ? `${property.totalBids} bid${property.totalBids !== 1 ? 's' : ''}` : 'No bids placed yet'}</span>
           </div>
         </div>
 

@@ -240,7 +240,7 @@ export default function PropertyCard({
                 </span>
                 {property.totalBids > 0 && (
                   <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded-full">
-                    {property.totalBids} bids
+                    {property.totalBids} bid{property.totalBids !== 1 ? 's' : ''}
                   </span>
                 )}
               </div>
@@ -248,14 +248,6 @@ export default function PropertyCard({
                 {displayPrice}
               </p>
               
-              {nextMinBid > 0 && (
-                <p className="text-xs text-slate-500">
-                  Next min bid:{" "}
-                  <span className="font-bold text-slate-700">
-                    £{nextMinBid.toLocaleString()}
-                  </span>
-                </p>
-              )}
               <button
                 className="w-full py-3.5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-bold hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-2"
                 onClick={(e) => {
@@ -310,7 +302,7 @@ export default function PropertyCard({
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-500 font-medium">Bids</span>
                         <span className="font-bold text-slate-700">
-                          {property.totalBids}
+                          {property.totalBids > 0 ? property.totalBids : 'No bids'}
                         </span>
                       </div>
                     )}
@@ -346,7 +338,7 @@ export default function PropertyCard({
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-500 font-medium">Bids</span>
                         <span className="font-bold text-slate-700">
-                          {property.totalBids}
+                          {property.totalBids > 0 ? property.totalBids : 'No bids'}
                         </span>
                       </div>
                     )}

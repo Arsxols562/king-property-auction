@@ -331,7 +331,7 @@ export default function AuctionDetail() {
     const amount = parseFloat(bidAmount);
     if (amount < nextMinBid) {
       showNotification(
-        `Minimum bid is £${nextMinBid.toLocaleString()}`,
+        `Bid must be at least £${nextMinBid.toLocaleString()}`,
         "error",
       );
       return;

@@ -57,7 +57,7 @@ export const placeBid = async (data, userId) => {
   // 5. Check bid is higher than property's current bid
   if (data.amount <= property.currentBid) {
     throw new Error(
-      `Bid must be higher than current bid of £${property.currentBid.toLocaleString()}`,
+      `⚠️ Bid must be higher than £${property.currentBid.toLocaleString()}`,
     );
   }
 
@@ -66,7 +66,7 @@ export const placeBid = async (data, userId) => {
     property.pricing?.minimumBidIncrement || auction.bidIncrement || 1000;
   if (data.amount < property.currentBid + bidIncrement) {
     throw new Error(
-      `Minimum bid increment is £${bidIncrement.toLocaleString()}`,
+      `⚠️ Bid must be at least £${(property.currentBid + bidIncrement).toLocaleString()}`,
     );
   }
 

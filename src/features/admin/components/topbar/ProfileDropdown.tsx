@@ -36,10 +36,10 @@ export default function ProfileDropdown() {
         <div className={`size-11 bg-gradient-to-br ${theme.primary} rounded-xl flex items-center justify-center shadow-lg`}>
           <span className="text-white font-black text-sm">{initials}</span>
         </div>
-        <div className="text-left hidden sm:block">
-          <p className="text-sm font-bold text-slate-900">{user?.name || "Admin User"}</p>
-          <p className="text-xs text-slate-600 font-medium">{user?.email || ""}</p>
-          <p className="text-xs font-bold text-purple-600 flex items-center gap-1">
+        <div className="text-left hidden sm:block min-w-0">
+          <p className="text-xs xl:text-sm font-bold text-slate-900 truncate max-w-[120px] xl:max-w-[160px]">{user?.name || "Admin User"}</p>
+          <p className="text-[10px] xl:text-xs text-slate-600 font-medium truncate max-w-[120px] xl:max-w-[160px]">{user?.email || ""}</p>
+          <p className="text-[10px] xl:text-xs font-bold text-purple-600 flex items-center gap-1">
             {isSuperAdmin && <Crown className="size-3" />}
             {roleLabel}
           </p>

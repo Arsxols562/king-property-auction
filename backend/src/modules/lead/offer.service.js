@@ -267,11 +267,21 @@ export const respondToOffer = async (offerId, status, message, adminId) => {
     try {
       const Property = (await import("../property/property.model.js")).default;
 
+      // Find buyer by email if not already linked to a user account
+      let buyerId = offer.submittedBy || null;
+      if (!buyerId && offer.email) {
+        const User = (await import("../user/user.model.js")).default;
+        const buyer = await User.findOne({ email: offer.email }).select("_id").lean();
+        buyerId = buyer?._id || null;
+      }
+
       // Mark property as sold
       await Property.findByIdAndUpdate(offer.property, {
         propertyStatus: "sold",
         soldPrice: offer.offerAmount,
         currentBid: offer.offerAmount,
+        soldTo: buyerId,
+        winningBidder: buyerId,
       });
 
       // Get property owner for seller reference

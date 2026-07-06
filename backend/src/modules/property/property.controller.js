@@ -247,14 +247,6 @@ export const getById = async (req, res) => {
     const userId = req.user?._id?.toString() || req.user?.id?.toString();
     const isOwner = ownerId && userId && ownerId === userId;
 
-    console.log("[getById] user role:", req.user?.role);
-    console.log("[getById] isAdmin:", isAdmin);
-    console.log("[getById] isOwner:", isOwner);
-    console.log(
-      "[getById] privateDocuments:",
-      propertyObj.legalInfo?.privateDocuments?.length,
-    );
-
     if (!isAdmin && !isOwner && propertyObj.legalInfo) {
       delete propertyObj.legalInfo.privateDocuments;
     }

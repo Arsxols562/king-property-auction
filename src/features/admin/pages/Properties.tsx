@@ -33,7 +33,7 @@ export default function Properties() {
   const [page, setPage] = useState(1);
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["admin-properties-mgmt", statusFilter, page],
+    queryKey: ["admin-properties-mgmt", statusFilter, search, page],
     queryFn: async () => {
       const params = new URLSearchParams({ page: String(page), limit: "20" });
       if (statusFilter) params.set("status", statusFilter);
@@ -59,13 +59,6 @@ export default function Properties() {
   const properties = data?.data || data?.properties || [];
   const pagination = data?.pagination || {};
 
-  const filtered = properties.filter(
-    (p: any) =>
-      !search ||
-      p.propertyTitle?.toLowerCase().includes(search.toLowerCase()) ||
-      p.location?.toLowerCase().includes(search.toLowerCase()) ||
-      p.seller?.name?.toLowerCase().includes(search.toLowerCase()),
-  );
 
   const handleApprove = async (id: string) => {
     try {
@@ -120,7 +113,7 @@ export default function Properties() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search title, location, owner..."
+              placeholder="Search by title, location, owner, type, status, price, lot#..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -158,7 +151,7 @@ export default function Properties() {
             <div className="flex items-center justify-center h-40">
               <div className="size-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : filtered.length === 0 ? (
+          ) : properties.length === 0 ? (
             <div className="text-center py-16 text-slate-400">
               <Building2 className="size-12 mx-auto mb-3 opacity-30" />
               <p className="font-bold">No properties found</p>
@@ -189,7 +182,7 @@ export default function Properties() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {filtered.map((p: any) => (
+                  {properties.map((p: any) => (
                     <tr
                       key={p._id}
                       className="hover:bg-slate-50 transition-colors"

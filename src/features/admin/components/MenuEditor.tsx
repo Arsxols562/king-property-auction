@@ -321,41 +321,41 @@ export default function MenuEditor({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden animate-in zoom-in duration-300">
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-6xl h-[95vh] sm:h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className={`bg-gradient-to-r ${theme.primary} p-6 flex items-center justify-between text-white`}>
-          <div className="flex items-center gap-4">
-            <div className="size-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-              <MenuIcon className="size-6 text-white" />
+        <div className={`bg-gradient-to-r ${theme.primary} p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white`}>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="size-10 sm:size-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0">
+              <MenuIcon className="size-5 sm:size-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-black">{editData ? "Edit" : "Create"} Menu</h2>
-              <p className="text-sm text-white/80 font-medium">Build your navigation menu with drag & drop</p>
+              <h2 className="text-lg sm:text-2xl font-black">{editData ? "Edit" : "Create"} Menu</h2>
+              <p className="text-xs sm:text-sm text-white/80 font-medium hidden sm:block">Build your navigation menu with drag & drop</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={handleSave}
-              className="px-4 py-2.5 bg-white text-blue-600 rounded-xl font-bold hover:bg-white/90 transition-all flex items-center gap-2 shadow-lg"
+              className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white text-blue-600 rounded-lg sm:rounded-xl text-sm font-bold hover:bg-white/90 transition-all flex items-center gap-1.5 shadow-lg"
             >
-              <Save className="size-4" />
-              Save Menu
+              <Save className="size-3.5 sm:size-4" />
+              Save
             </button>
             <button
               onClick={onClose}
               title="Close"
-              className="p-2.5 bg-white/20 backdrop-blur-md hover:bg-white/30 rounded-xl transition-all"
+              className="p-2 sm:p-2.5 bg-white/20 backdrop-blur-md hover:bg-white/30 rounded-lg sm:rounded-xl transition-all"
             >
-              <X className="size-6 text-white" />
+              <X className="size-5 sm:size-6 text-white" />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
           {/* Left Panel */}
-          <div className="w-96 bg-slate-50 border-r-2 border-slate-200 overflow-y-auto">
+          <div className="w-full lg:w-96 bg-slate-50 lg:border-r-2 border-b-2 lg:border-b-0 border-slate-200 overflow-y-auto flex-shrink-0 lg:max-h-full max-h-[50vh]">
             <div className="p-6">
               {/* Menu Settings */}
               <h3 className="text-lg font-black text-slate-900 mb-4">Menu Settings</h3>
@@ -556,7 +556,7 @@ export default function MenuEditor({
                         <X className="size-3" />
                         No Icon
                       </button>
-                      <div className="grid grid-cols-6 gap-1 max-h-36 overflow-y-auto">
+                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-1 max-h-36 overflow-y-auto">
                         {allIcons
                           .filter((name) => !iconSearch || name.toLowerCase().includes(iconSearch.toLowerCase()))
                           .map((iconName) => {
@@ -756,7 +756,7 @@ export default function MenuEditor({
 
           {/* Right Panel - Menu Preview */}
           <div className="flex-1 bg-gradient-to-br from-slate-100 to-slate-200 overflow-y-auto">
-            <div className="p-8">
+            <div className="p-4 sm:p-8">
               <div className="max-w-4xl mx-auto">
                 {/* Menu Info Card */}
                 <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">

@@ -51,11 +51,9 @@ export default function EditUserModal({ user, onClose }: EditUserModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg">
-        <div
-          className={`bg-gradient-to-r ${theme.primary} p-6 flex items-center justify-between text-white rounded-t-3xl`}
-        >
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg">
+        <div className={`bg-gradient-to-r ${theme.primary} p-4 sm:p-6 flex items-center justify-between text-white rounded-t-2xl sm:rounded-t-3xl`}>
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-xl bg-white/20 flex items-center justify-center">
               <User className="size-5" />
@@ -73,7 +71,7 @@ export default function EditUserModal({ user, onClose }: EditUserModalProps) {
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
+          <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
               {error}

@@ -520,7 +520,7 @@ export default function EditProperty() {
           )}
         </div>
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-4 border-2 border-white/60 mb-4">
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-1 flex-wrap overflow-x-auto pb-2">
             {STEPS.map((s) => {
               const Icon = s.icon;
               const isActive = step === s.number;
